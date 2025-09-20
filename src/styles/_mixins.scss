@@ -1,0 +1,18 @@
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin responsive-card($sm-padding: 1rem, $md-padding: 2rem) {
+  width: 100%;
+  max-width: 400px;
+  padding: $md-padding;
+  border-radius: $border-radius;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background: #fff;
+
+  @media (max-width: $breakpoint-sm) {
+    padding: $sm-padding;
+  }
+}

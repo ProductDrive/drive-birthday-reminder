@@ -1,0 +1,37 @@
+<div class="celebrants-container">
+  <h2>🎉 Celebrants</h2>
+
+  <div class="celebrant-list">
+    <mat-card *ngFor="let c of celebrants$ | async" class="celebrant-card">
+      
+      <img
+        mat-card-image
+        [src]="c.pictureUrl || 'https://www.shutterstock.com/shutterstock/photos/1292838640/display_1500/stock-vector-exploding-party-popper-with-confetti-bright-cartoon-birthday-cracker-isolated-vector-illustration-1292838640.jpg'"
+        alt="{{ c.name }}"
+      />
+      <mat-card-header>
+        <mat-card-title>{{ c.name }}</mat-card-title>
+        <mat-card-subtitle>
+          Birthday: {{ c.birthDay }}/{{ c.birthMonth }}
+        </mat-card-subtitle>
+          <mat-card-actions>
+            <button mat-raised-button color="primary" (click)="sendWishes(c)">
+            Send Wishes
+          </button>
+          </mat-card-actions>
+      </mat-card-header>
+    </mat-card>
+  </div>
+
+  <div class="invite-section">
+    <p>Send form link to friends and family</p>
+    <button
+      mat-fab
+      color="accent"
+      (click)="copyInviteLink()"
+      matTooltip="Copy Invite Link"
+    >
+      <mat-icon>content_copy</mat-icon>
+    </button>
+  </div>
+</div>

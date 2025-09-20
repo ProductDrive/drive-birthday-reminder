@@ -1,0 +1,59 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+@import '../../styles/utils';
+
+.auth-container {
+  @include flex-center;
+  min-height: 100vh;
+  padding: 1rem;
+  background: #f8f9fa;
+
+  mat-card {
+    @include responsive-card();
+    background: #ffffff; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    border-radius: $border-radius;
+
+    h2 {
+      text-align: center;
+      color: $primary-color;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 1rem;
+
+      .mat-input-element {
+        font-size: 0.95rem;
+      }
+    }
+
+    button {
+      width: 100%;
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+
+    .message {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+
+      &.error {
+        color: $error-color;
+      }
+
+      &.success {
+        color: $success-color;
+      }
+    }
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    mat-card {
+      padding: 1.2rem;
+    }
+  }
+}

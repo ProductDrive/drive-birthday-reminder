@@ -1,0 +1,81 @@
+<div class="birthday-form-container">
+  <h2>🎂 Submit Your Birthday</h2>
+  <br>
+  <br>
+
+  <mat-card class="form-card">
+
+    <!-- Thank You Message -->
+    <div *ngIf="submitted" class="thank-you">
+      <h2>Thank you! 🎉</h2>
+      <p>Your birthday has been submitted.</p>
+
+      <button mat-raised-button color="primary" (click)="submitted = false">
+        Submit Another Birthday
+      </button>
+    </div>
+
+    <!-- Birthday Form -->
+    <form *ngIf="!submitted" [formGroup]="birthdayForm" (ngSubmit)="submitForm()">
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Name</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          placeholder="Enter your full name"
+          required
+        />
+      </mat-form-field>
+
+      <div class="birthday-inputs">
+        <mat-form-field appearance="fill">
+          <mat-label>Day</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="birthDay"
+            min="1"
+            max="31"
+            required
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Month</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="birthMonth"
+            min="1"
+            max="12"
+            required
+          />
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Picture URL</mat-label>
+        <input
+          matInput
+          formControlName="pictureUrl"
+          placeholder="Paste a picture link from social media"
+        />
+        <mat-hint>
+          Optional — paste a link from Facebook, Instagram, or other platforms.
+        </mat-hint>
+      </mat-form-field>
+
+      <mat-card-actions>
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="birthdayForm.invalid"
+        >
+          Submit
+        </button>
+      </mat-card-actions>
+    </form>
+  </mat-card>
+</div>
