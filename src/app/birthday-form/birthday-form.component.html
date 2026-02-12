@@ -1,81 +1,105 @@
-<div class="birthday-form-container">
-  <h2>🎂 Submit Your Birthday</h2>
-  <br>
-  <br>
+<div
+  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-50 via-white to-pink-100 px-4 py-12">
 
-  <mat-card class="form-card">
+  <div class="w-full max-w-lg">
 
-    <!-- Thank You Message -->
-    <div *ngIf="submitted" class="thank-you">
-      <h2>Thank you! 🎉</h2>
-      <p>Your birthday has been submitted.</p>
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 p-8">
 
-      <button mat-raised-button color="primary" (click)="submitted = false">
-        Submit Another Birthday
-      </button>
-    </div>
-
-    <!-- Birthday Form -->
-    <form *ngIf="!submitted" [formGroup]="birthdayForm" (ngSubmit)="submitForm()">
-
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Name</mat-label>
-        <input
-          matInput
-          formControlName="name"
-          placeholder="Enter your full name"
-          required
-        />
-      </mat-form-field>
-
-      <div class="birthday-inputs">
-        <mat-form-field appearance="fill">
-          <mat-label>Day</mat-label>
-          <input
-            matInput
-            type="number"
-            formControlName="birthDay"
-            min="1"
-            max="31"
-            required
-          />
-        </mat-form-field>
-
-        <mat-form-field appearance="fill">
-          <mat-label>Month</mat-label>
-          <input
-            matInput
-            type="number"
-            formControlName="birthMonth"
-            min="1"
-            max="12"
-            required
-          />
-        </mat-form-field>
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 tracking-tight">
+          🎂 Submit Your Birthday
+        </h2>
+        <p class="text-gray-500 text-sm mt-2">
+          Let us celebrate you on your special day
+        </p>
       </div>
 
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Picture URL</mat-label>
-        <input
-          matInput
-          formControlName="pictureUrl"
-          placeholder="Paste a picture link from social media"
-        />
-        <mat-hint>
-          Optional — paste a link from Facebook, Instagram, or other platforms.
-        </mat-hint>
-      </mat-form-field>
+      <!-- Thank You State -->
+      <div *ngIf="submitted" class="text-center py-8">
 
-      <mat-card-actions>
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          [disabled]="birthdayForm.invalid"
-        >
-          Submit
+        <div class="text-5xl mb-4">🎉</div>
+
+        <h3 class="text-2xl font-semibold text-gray-800">
+          Thank You!
+        </h3>
+
+        <p class="text-gray-500 mt-2">
+          Your birthday has been successfully submitted.
+        </p>
+
+        <button (click)="submitted = false" class="mt-6 px-6 py-3 rounded-xl font-medium text-white
+                 bg-pink-500 hover:bg-pink-600
+                 active:scale-[0.98]
+                 transition-all duration-200 shadow-md hover:shadow-lg">
+          Submit Another Birthday
         </button>
-      </mat-card-actions>
-    </form>
-  </mat-card>
+
+      </div>
+
+      <!-- Birthday Form -->
+      <form *ngIf="!submitted" [formGroup]="birthdayForm" (ngSubmit)="submitForm()" class="space-y-6">
+
+        <!-- Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-2">
+            Full Name
+          </label>
+          <input type="text" formControlName="name" placeholder="Enter your full name" class="w-full px-4 py-3 rounded-xl border border-gray-200
+                   focus:ring-2 focus:ring-pink-500 focus:border-pink-500
+                   outline-none transition-all duration-200" />
+        </div>
+
+        <!-- Day & Month -->
+        <div class="grid grid-cols-2 gap-4">
+
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">
+              Day
+            </label>
+            <input type="number" formControlName="birthDay" min="1" max="31" class="w-full px-4 py-3 rounded-xl border border-gray-200
+                     focus:ring-2 focus:ring-pink-500 focus:border-pink-500
+                     outline-none transition-all duration-200" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">
+              Month
+            </label>
+            <input type="number" formControlName="birthMonth" min="1" max="12" class="w-full px-4 py-3 rounded-xl border border-gray-200
+                     focus:ring-2 focus:ring-pink-500 focus:border-pink-500
+                     outline-none transition-all duration-200" />
+          </div>
+
+        </div>
+
+        <!-- Picture URL -->
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-2">
+            Picture URL
+          </label>
+          <input type="text" formControlName="pictureUrl" placeholder="Paste a picture link from social media" class="w-full px-4 py-3 rounded-xl border border-gray-200
+                   focus:ring-2 focus:ring-pink-500 focus:border-pink-500
+                   outline-none transition-all duration-200" />
+          <p class="text-xs text-gray-400 mt-2">
+            Optional — paste a link from Facebook, Instagram, or other platforms.
+          </p>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" [disabled]="birthdayForm.invalid" class="w-full py-3 rounded-xl font-semibold text-white
+                 bg-pink-500 hover:bg-pink-600
+                 disabled:bg-gray-300 disabled:cursor-not-allowed
+                 active:scale-[0.98]
+                 transition-all duration-200 shadow-lg hover:shadow-xl">
+          Submit 🎂
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
 </div>
