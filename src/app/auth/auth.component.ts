@@ -19,7 +19,7 @@ import { Router } from '@angular/router';
 export class AuthComponent {
   email = '';
   password = '';
-  isLogin = false;
+  isLogin = true;
   message = '';
 
   constructor(private authService: AuthService,
