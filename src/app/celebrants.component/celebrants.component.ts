@@ -30,7 +30,6 @@ export class CelebrantsComponent implements OnInit {
     private celebrantsService: CelebrantsService,
     private router: Router,
     private auth: Auth,
-    private cLink: string
   ) { }
 
   ngOnInit(): void {
