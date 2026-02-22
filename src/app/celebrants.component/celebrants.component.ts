@@ -29,45 +29,47 @@ export class CelebrantsComponent implements OnInit {
   constructor(
     private celebrantsService: CelebrantsService,
     private router: Router,
-    private auth: Auth
-  ) {}
+    private auth: Auth,
+    private cLink: string
+  ) { }
 
   ngOnInit(): void {
+    const user = this.auth.currentUser;
     this.celebrants$ = this.celebrantsService.getCelebrants();
   }
 
   async shortenUrl(longUrl: string): Promise<string> {
-  const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
-  return res.text();
-}
+    const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+    return res.text();
+  }
 
 
-    async sendWishes(celebrant: Celebrant) {
-      const defaultMessage = `Happy Birthday ${celebrant.name}! 🎉`;
+  async sendWishes(celebrant: Celebrant) {
+    const defaultMessage = `Happy Birthday ${celebrant.name}! 🎉`;
 
-      let pictureLink = '';
-      if (celebrant.pictureUrl) {
-        pictureLink = await this.shortenUrl(celebrant.pictureUrl);
-      }
+    let pictureLink = '';
+    if (celebrant.pictureUrl) {
+      pictureLink = await this.shortenUrl(celebrant.pictureUrl);
+    }
 
-      let fullMessage = '';
+    let fullMessage = '';
 
-      if (pictureLink && celebrant.message) {
-        // Both picture and custom message exist
-        fullMessage = `${celebrant.message}\n\n${pictureLink}`;
-      } else if (pictureLink && !celebrant.message) {
-        // Only picture exists, use default message
-        fullMessage = `${defaultMessage}\n\n${pictureLink}`;
-      } else if (!pictureLink && celebrant.message) {
-        // Only custom message exists
-        fullMessage = celebrant.message;
-      } else {
-        // Neither exists, use default message
-        fullMessage = defaultMessage;
-      }
+    if (pictureLink && celebrant.message) {
+      // Both picture and custom message exist
+      fullMessage = `${celebrant.message}\n\n${pictureLink}`;
+    } else if (pictureLink && !celebrant.message) {
+      // Only picture exists, use default message
+      fullMessage = `${defaultMessage}\n\n${pictureLink}`;
+    } else if (!pictureLink && celebrant.message) {
+      // Only custom message exists
+      fullMessage = celebrant.message;
+    } else {
+      // Neither exists, use default message
+      fullMessage = defaultMessage;
+    }
 
-      const url = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
-      window.open(url, '_blank');
+    const url = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
+    window.open(url, '_blank');
   }
 
   addCelebrant() {
@@ -85,6 +87,16 @@ export class CelebrantsComponent implements OnInit {
     }
     navigator.clipboard.writeText(this.inviteLink);
     alert('Invite link copied to clipboard!');
+  }
+
+  openForm() {
+    const user = this.auth.currentUser;
+    if (!user) {
+      alert('You must be logged in to access the form.');
+      return;
+    }
+    const link = `${window.location.origin}/form/${user?.uid}`;
+    window.open(link, '_blank');
   }
 
 }
