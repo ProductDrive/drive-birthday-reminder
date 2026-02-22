@@ -3,24 +3,30 @@
   <div class="max-w-6xl mx-auto">
 
     <!-- Header -->
+    <div class="mb-6">
+      <div class="flex items-center space-x-2">
+        <input class="copy-input flex-1" [value]="inviteLink" readonly placeholder="Invite link" />
+        <button class="copy-btn" (click)="copyInviteLink()" title="Copy invite link">
+          <span class="material-icons">content_copy</span>
+        </button>
+      </div>
+      <span class="text-gray-400 text-lg">Share this link with your loved ones.</span>
+    </div>
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10">
       <div>
-        <!-- Send a form to friends and families to collect their birthday info and send them wishes on their special day! -->
-        
-          <button (click)="copyInviteLink()" class="mt-6 inline-flex items-center justify-center
-               b-2 p-2 rounded 
-               bg-purple-500 hover:bg-purple-600 
-               text-lg font-medium text-white 
-               hover:shadow-xl cursor-pointer
-               active:scale-95
-               transition-all duration-200" title="Send a form to friends and families to collect their birthday info and send them wishes on their special day!">
-        Send Birthday Form &#9993;
-      </button>
-      <br>
-      <br>
         <h2 class="text-4xl font-bold text-gray-800 tracking-tight">
           🎉 Celebrants
         </h2>
+      </div>
+      <div>
+        <button (click)="addCelebrant()" class="inline-flex items-center px-4 py-2 rounded-full
+                 hover:bg-pink-300 border border-pink-400 font-medium 
+                 shadow-lg hover:shadow-xl hover:text-white
+                 active:scale-95
+                 transition-all duration-200">
+          <mat-icon class="mr-2">add</mat-icon>
+          Add a celebrant
+        </button>
       </div>
     </div>
 
@@ -62,28 +68,6 @@
         </div>
 
       </div>
-
-    </div>
-
-    <!-- Invite Section -->
-    <div class="mt-16 bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
-
-      <p class="text-gray-600 text-lg font-medium">
-        Send the form link to friends and family
-      </p>
-
-      <button (click)="copyInviteLink()" class="mt-6 inline-flex items-center justify-center
-               w-14 h-14 rounded-full
-               bg-purple-500 hover:bg-purple-600
-               text-white shadow-lg hover:shadow-xl
-               active:scale-95
-               transition-all duration-200" title="Copy Invite Link">
-        📋
-      </button>
-
-      <p class="text-xs text-gray-400 mt-3">
-        Tap to copy invite link
-      </p>
 
     </div>
 

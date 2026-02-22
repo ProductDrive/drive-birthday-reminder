@@ -1,0 +1,55 @@
+.copy-input {
+	border-radius: 2rem;
+	background: #f3f4f6;
+	border: none;
+	box-shadow: none;
+	padding: 0.5rem 1rem;
+	font-size: 1rem;
+	color: #333;
+}
+
+.copy-btn {
+	background: #f3f4f6;
+	border-radius: 50%;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+	border: none;
+	padding: 0.5rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+}
+
+.material-icons {
+	font-family: 'Material Icons';
+	font-size: 1.5rem;
+}
+// Copy input styling
+
+.copy-input {
+	border-radius: 2rem !important;
+	background: #f3f4f6 !important; /* Tailwind gray-100 */
+	box-shadow: none !important;
+	.mat-form-field-outline {
+		border: none !important;
+		border-radius: 2rem !important;
+	}
+	.mat-form-field-outline-thick {
+		border: none !important;
+	}
+	.mat-form-field-outline-start,
+	.mat-form-field-outline-end {
+		border: none !important;
+	}
+	input {
+		border-radius: 2rem !important;
+		background: #f3f4f6 !important;
+		border: none !important;
+		box-shadow: none !important;
+	}
+}
+
+.copy-btn {
+	background: #f3f4f6 !important;
+	border-radius: 50% !important;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
