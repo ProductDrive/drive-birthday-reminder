@@ -1,3 +1,10 @@
+<app-celebrants-edit-modal
+  *ngIf="showEditModal"
+  [data]="editData!"
+  [open]="showEditModal"
+  (closeModal)="closeEditModal()"
+  (save)="saveEditModal($event)">
+</app-celebrants-edit-modal>
 <div class="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-100 px-6 py-12">
 
   <div class="max-w-6xl mx-auto">
@@ -44,6 +51,10 @@
             alt="{{ c.name }}"
             class="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          <button class="absolute top-2 right-2 rounded-full p-2 hover:text-pink-400 transition-all duration-200 edit-btn"
+                  (click)="editCelebrant(c)" title="Edit celebrant">
+            <span class="material-icons">edit</span>
+          </button>
         </div>
 
         <!-- Content -->
@@ -54,7 +65,7 @@
           </h3>
 
           <p class="text-gray-500 text-sm mt-1">
-            🎂 Birthday: {{ c.birthDay }}/{{ c.birthMonth }}
+            🎂 Birthday: {{ formatBirthday(c.birthDay, c.birthMonth) }}
           </p>
 
           <!-- Action -->

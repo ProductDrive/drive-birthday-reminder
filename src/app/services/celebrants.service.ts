@@ -15,6 +15,12 @@ export interface Celebrant {
 
 @Injectable({ providedIn: 'root' })
 export class CelebrantsService {
+    async updateCelebrant(id: string, data: Partial<Celebrant>): Promise<void> {
+      const coll = collection(this.firestore, 'celebrants');
+      // Firestore doc reference
+      const docRef = (await import('firebase/firestore')).doc(coll, id);
+      await (await import('firebase/firestore')).updateDoc(docRef, data);
+    }
   constructor(private firestore: Firestore, private auth: Auth) {}
 
   getCelebrants(): Observable<Celebrant[]> {

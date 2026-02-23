@@ -1,0 +1,40 @@
+<div class="modal-backdrop" *ngIf="open">
+  <div class="modal-content">
+    <h2>Edit Celebrant</h2>
+    <form (ngSubmit)="onSave()" #editForm="ngForm">
+      <label>Name</label>
+      <input type="text" [(ngModel)]="localData.name" name="name" required />
+
+      <div class="flex-row">
+        <div>
+          <label>Day</label>
+          <input type="number" [(ngModel)]="localData.birthDay" name="birthDay" min="1" max="31" required />
+        </div>
+        <div>
+          <label>Month</label>
+          <input type="number" [(ngModel)]="localData.birthMonth" name="birthMonth" min="1" max="12" required />
+        </div>
+      </div>
+
+      <label>Notification Type</label>
+      <select [(ngModel)]="localData.notificationType" name="notificationType" required>
+        <option *ngFor="let type of notificationTypes" [value]="type">{{ type | titlecase }}</option>
+      </select>
+
+      <div class="notify-section">
+        <div class="mb-2 font-medium">Notify Me:</div>
+        <div class="notify-options">
+          <label *ngFor="let option of notifyOptions">
+            <input type="checkbox" [checked]="localData.notifyTimes.includes(option.value)" (change)="toggleNotifyTime(option.value)" />
+            {{ option.label }}
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" (click)="onClose()">Cancel</button>
+        <button type="submit" [disabled]="!editForm.form.valid">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

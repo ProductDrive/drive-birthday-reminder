@@ -10,16 +10,65 @@ import { Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
-import { CdkAriaLive } from '@angular/cdk/a11y';
+import { map } from 'rxjs/operators';
+import { CelebrantsEditModalComponent, EditCelebrantData } from './celebrants-edit-modal.component';
 
 @Component({
   selector: 'app-celebrants',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, AsyncPipe, MatIconModule, MatInputModule, MatFormFieldModule, CdkAriaLive],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    AsyncPipe,
+    MatIconModule,
+    MatInputModule,
+    MatFormFieldModule,
+    CelebrantsEditModalComponent
+  ],
   templateUrl: './celebrants.component.html',
   styleUrls: ['./celebrants.component.scss'],
 })
 export class CelebrantsComponent implements OnInit {
+        showEditModal = false;
+        editData: EditCelebrantData | null = null;
+        editingCelebrantId: string | null = null;
+  editCelebrant(celebrant: Celebrant) {
+    this.editingCelebrantId = celebrant.id || null;
+    this.editData = {
+      name: celebrant.name,
+      birthDay: celebrant.birthDay,
+      birthMonth: celebrant.birthMonth,
+      notificationType: 'whatsapp',
+      notifyTimes: []
+    };
+    this.showEditModal = true;
+  }
+
+  closeEditModal() {
+    this.showEditModal = false;
+    this.editData = null;
+    this.editingCelebrantId = null;
+  }
+
+  async saveEditModal(data: EditCelebrantData) {
+    if (this.editingCelebrantId) {
+      await this.celebrantsService.updateCelebrant(this.editingCelebrantId, {
+        name: data.name,
+        birthDay: data.birthDay,
+        birthMonth: data.birthMonth
+        // You can add notificationType and notifyTimes to Firestore if desired
+      });
+    }
+    this.closeEditModal();
+  }
+    monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    formatBirthday(day: number, month: number): string {
+      const dayStr = day.toString().padStart(2, '0');
+      const monthStr = this.monthNames[month - 1] || month.toString();
+      return `${dayStr} / ${monthStr}`;
+    }
   celebrants$!: Observable<Celebrant[]>;
   get inviteLink(): string {
     const user = this.auth.currentUser;
@@ -34,7 +83,15 @@ export class CelebrantsComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.auth.currentUser;
-    this.celebrants$ = this.celebrantsService.getCelebrants();
+    this.celebrants$ = this.celebrantsService.getCelebrants().pipe(
+      // Sort by birthMonth, then birthDay
+      map((celebrants: Celebrant[]) => celebrants.slice().sort((a, b) => {
+        if (a.birthMonth !== b.birthMonth) {
+          return a.birthMonth - b.birthMonth;
+        }
+        return a.birthDay - b.birthDay;
+      }))
+    );
   }
 
   async shortenUrl(longUrl: string): Promise<string> {
