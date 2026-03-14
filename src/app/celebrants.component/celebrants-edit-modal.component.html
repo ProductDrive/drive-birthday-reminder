@@ -1,5 +1,5 @@
-<div class="modal-backdrop" *ngIf="open">
-  <div class="modal-content">
+<div class="modal-backdrop" *ngIf="open" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
     <h2>Edit Celebrant</h2>
     <form (ngSubmit)="onSave()" #editForm="ngForm">
       <label>Name</label>
@@ -17,15 +17,30 @@
       </div>
 
       <label>Notification Type</label>
-      <select [(ngModel)]="localData.notificationType" name="notificationType" required>
-        <option *ngFor="let type of notificationTypes" [value]="type">{{ type | titlecase }}</option>
-      </select>
+      <div class="notify-type-options">
+        <label *ngFor="let type of notificationTypes">
+          <input 
+            type="checkbox" 
+            [checked]="isNotificationTypeChecked(type)" 
+            (change)="toggleNotificationType(type)" 
+            [name]="'notif-' + type" />
+          {{ type | titlecase }}
+        </label>
+      </div>
+
+      <div *ngIf="isNotificationTypeChecked('whatsapp')" class="whatsapp-note">
+        <p><strong>Note:</strong> WhatsApp notifications are not yet available. Your subscription has been saved and you'll be notified when this feature launches. <strong>Standard messaging rates may apply</strong> .</p>
+      </div>
 
       <div class="notify-section">
         <div class="mb-2 font-medium">Notify Me:</div>
         <div class="notify-options">
           <label *ngFor="let option of notifyOptions">
-            <input type="checkbox" [checked]="localData.notifyTimes.includes(option.value)" (change)="toggleNotifyTime(option.value)" />
+            <input 
+              type="checkbox" 
+              [checked]="isNotifyTimeChecked(option.value)" 
+              (change)="toggleNotifyTime(option.value)"
+              [name]="'time-' + option.value" />
             {{ option.label }}
           </label>
         </div>

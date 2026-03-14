@@ -28,6 +28,21 @@
   margin: 1rem 0;
 }
 
+.whatsapp-note {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin: 0.75rem 0;
+  font-size: 0.875rem;
+  color: #92400e;
+  
+  p {
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
 .notify-options {
   display: flex;
   flex-direction: column;
