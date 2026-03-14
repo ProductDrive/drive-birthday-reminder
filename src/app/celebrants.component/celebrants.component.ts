@@ -30,19 +30,30 @@ import { CelebrantsEditModalComponent, EditCelebrantData } from './celebrants-ed
   styleUrls: ['./celebrants.component.scss'],
 })
 export class CelebrantsComponent implements OnInit {
-        showEditModal = false;
-        editData: EditCelebrantData | null = null;
-        editingCelebrantId: string | null = null;
+  showEditModal = false;
+  editData: EditCelebrantData | null = null;
+  editingCelebrantId: string | null = null;
+
   editCelebrant(celebrant: Celebrant) {
     this.editingCelebrantId = celebrant.id || null;
     this.editData = {
+      id: celebrant.id,
       name: celebrant.name,
       birthDay: celebrant.birthDay,
       birthMonth: celebrant.birthMonth,
-      notificationType: 'whatsapp',
+      notificationType: [],
       notifyTimes: []
     };
     this.showEditModal = true;
+  }
+
+  onModalOpen() {
+    if (this.editData?.id) {
+      const modal = document.querySelector('app-celebrants-edit-modal');
+      if (modal && (modal as any).onOpen) {
+        (modal as any).onOpen();
+      }
+    }
   }
 
   closeEditModal() {
@@ -57,19 +68,21 @@ export class CelebrantsComponent implements OnInit {
         name: data.name,
         birthDay: data.birthDay,
         birthMonth: data.birthMonth
-        // You can add notificationType and notifyTimes to Firestore if desired
       });
     }
     this.closeEditModal();
   }
-    monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-    formatBirthday(day: number, month: number): string {
-      const dayStr = day.toString().padStart(2, '0');
-      const monthStr = this.monthNames[month - 1] || month.toString();
-      return `${dayStr} / ${monthStr}`;
-    }
+  monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  formatBirthday(day: number, month: number): string {
+    const dayStr = day.toString().padStart(2, '0');
+    const monthStr = this.monthNames[month - 1] || month.toString();
+    return `${dayStr} / ${monthStr}`;
+  }
+
   celebrants$!: Observable<Celebrant[]>;
+
   get inviteLink(): string {
     const user = this.auth.currentUser;
     return user ? `${window.location.origin}/form/${user.uid}` : '';
@@ -84,7 +97,6 @@ export class CelebrantsComponent implements OnInit {
   ngOnInit(): void {
     const user = this.auth.currentUser;
     this.celebrants$ = this.celebrantsService.getCelebrants().pipe(
-      // Sort by birthMonth, then birthDay
       map((celebrants: Celebrant[]) => celebrants.slice().sort((a, b) => {
         if (a.birthMonth !== b.birthMonth) {
           return a.birthMonth - b.birthMonth;
@@ -99,7 +111,6 @@ export class CelebrantsComponent implements OnInit {
     return res.text();
   }
 
-
   async sendWishes(celebrant: Celebrant) {
     const defaultMessage = `Happy Birthday ${celebrant.name}! 🎉`;
 
@@ -111,16 +122,12 @@ export class CelebrantsComponent implements OnInit {
     let fullMessage = '';
 
     if (pictureLink && celebrant.message) {
-      // Both picture and custom message exist
       fullMessage = `${celebrant.message}\n\n${pictureLink}`;
     } else if (pictureLink && !celebrant.message) {
-      // Only picture exists, use default message
       fullMessage = `${defaultMessage}\n\n${pictureLink}`;
     } else if (!pictureLink && celebrant.message) {
-      // Only custom message exists
       fullMessage = celebrant.message;
     } else {
-      // Neither exists, use default message
       fullMessage = defaultMessage;
     }
 
@@ -154,5 +161,4 @@ export class CelebrantsComponent implements OnInit {
     const link = `${window.location.origin}/form/${user?.uid}`;
     window.open(link, '_blank');
   }
-
 }
