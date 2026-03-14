@@ -49,4 +49,3 @@ Thumbs.db
 # Environment variables
 .env
 .env.prod
-src/environments/environment.prod.ts
