@@ -3,24 +3,33 @@ const fs = require('fs');
 const path = require('path');
 
 function generateEnvFile(envFile, outputFile) {
-  const result = dotenv.config({ path: envFile, override: true });
-  
-  if (result.error) {
-    console.error(`Error loading ${envFile}:`, result.error.message);
-    process.exit(1);
+  try {
+    const result = dotenv.config({ path: envFile, override: true });
+    if (result.error && result.error.code !== 'ENOENT') {
+      console.error(`Error loading ${envFile}:`, result.error.message);
+      process.exit(1);
+    }
+  } catch (e) {
+    if (e.code !== 'ENOENT') {
+      console.error(`Error loading ${envFile}:`, e.message);
+      process.exit(1);
+    }
   }
 
+  const isProduction = outputFile.includes('prod');
+  const apiUrl = process.env.NG_APP_API_URL || process.env.API_URL || (isProduction ? 'https://birthday.drivesolution.cloud' : 'http://localhost:5002');
+  
   const content = `export const environment = {
-  production: ${outputFile.includes('prod')},
-  apiUrl: '${process.env.API_URL || ''}',
-  firebase: ${JSON.stringify({
-    projectId: "afebdayrem",
-    appId: "1:531316247978:web:96f441523b5bcacd622fd3",
-    storageBucket: "afebdayrem.firebasestorage.app",
-    apiKey: "AIzaSyAw8B4NLZ-M4tIS8UnODMOtXqE6qUc-4NM",
-    authDomain: "afebdayrem.firebaseapp.com",
-    messagingSenderId: "531316247978"
-  })}
+  production: ${isProduction},
+  apiUrl: process.env['NG_APP_API_URL'] || '${apiUrl}',
+  firebase: {
+    projectId: process.env['NG_APP_FIREBASE_PROJECT_ID']',
+    appId: process.env['NG_APP_FIREBASE_APP_ID'],
+    storageBucket: process.env['NG_APP_FIREBASE_STORAGE_BUCKET'],
+    apiKey: process.env['NG_APP_FIREBASE_API_KEY'],
+    authDomain: process.env['NG_APP_FIREBASE_AUTH_DOMAIN'],
+    messagingSenderId: process.env['NG_APP_FIREBASE_MESSAGING_SENDER_ID']'
+  }
 };
 `;
 
