@@ -51,7 +51,8 @@ export class AuthComponent implements OnInit {
         this.router.navigate(['/celebrants']);
       }
     } catch (err: any) {
-      this.message = `❌ ${err.message}`;
+      console.error(err.message);
+      this.message = `❌ Opps! Something went wrong please contact support.`;
     }
   }
 }
