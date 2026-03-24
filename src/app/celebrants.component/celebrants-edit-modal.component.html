@@ -28,8 +28,9 @@
         </label>
       </div>
 
-      <div *ngIf="isNotificationTypeChecked('whatsapp')" class="whatsapp-note">
-        <p><strong>Note:</strong> WhatsApp notifications are not yet available. Your subscription has been saved and you'll be notified when this feature launches. <strong>Standard messaging rates may apply</strong> .</p>
+      <div *ngIf="isNotificationTypeChecked('whatsapp')" class="whatsapp-note" role="alert">
+        <span class="warning-icon" aria-hidden="true">&#9888;</span>
+        <p><strong>Note:</strong> WhatsApp notifications are not yet available. Your subscription has been saved and you'll be notified when this feature launches. <strong>Standard messaging rates may apply</strong>.</p>
       </div>
 
       <div class="notify-section">
