@@ -1,10 +1,15 @@
-// Colors
-$primary-color: #1976d2;
-$accent-color: #42a5f5;
-$success-color: #388e3c;
-$error-color: #d32f2f;
+// Accessible Color Palette (WCAG AA+ compliant)
+// Using high-contrast colors that work for color-blind users
+$primary-color: #0056b3;       // Darker blue - better contrast
+$accent-color: #0066cc;         // Accessible blue
+$success-color: #166534;        // Dark green - high contrast
+$success-bg: #dcfce7;           // Light green background
+$error-color: #b91c1c;          // Dark red - high contrast
+$error-bg: #fee2e2;             // Light red background
+$warning-color: #92400e;         // Dark amber - high contrast
+$warning-bg: #fef3c7;           // Light amber background
 $background-color: #ffffff;
-$grey-color: #f0f0f0;
+$grey-color: #f5f5f5;           // Slightly darker for better contrast
 $background-gradient: linear-gradient(135deg, $background-color, $grey-color);
 
 // Spacing
