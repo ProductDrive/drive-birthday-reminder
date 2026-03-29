@@ -20,11 +20,13 @@
       <span class="text-gray-400 text-lg">Share this link with your loved ones.</span>
     </div>
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10">
-      <div>
-        <h2 class="text-4xl font-bold text-gray-800 tracking-tight">
-          🎉 Celebrants
-        </h2>
-      </div>
+      <h2 class="text-4xl font-bold text-gray-800 tracking-tight">
+        Celebrants
+        <span *ngIf="(celebrants$ | async) as celebrants" 
+              class="inline-block align-middle ml-2 bg-blue-600 text-white text-sm font-bold rounded-full h-6 px-2 min-w-[24px] text-center leading-6 shadow-md">
+          {{ celebrants.length > 99 ? '99+' : celebrants.length }}
+        </span>
+      </h2>
       <div>
         <button (click)="addCelebrant()" class="inline-flex items-center px-4 py-2 rounded-full
                  bg-transparent hover:bg-blue-50 border-2 border-blue-600 font-medium text-blue-600
