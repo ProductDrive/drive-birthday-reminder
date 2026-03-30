@@ -6,12 +6,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 import { map } from 'rxjs/operators';
 import { CelebrantsEditModalComponent, EditCelebrantData } from './celebrants-edit-modal.component';
+import { AuthService, UserProfile } from '../services/auth.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-celebrants',
@@ -24,6 +27,8 @@ import { CelebrantsEditModalComponent, EditCelebrantData } from './celebrants-ed
     MatIconModule,
     MatInputModule,
     MatFormFieldModule,
+    MatCheckboxModule,
+    FormsModule,
     CelebrantsEditModalComponent
   ],
   templateUrl: './celebrants.component.html',
@@ -33,6 +38,12 @@ export class CelebrantsComponent implements OnInit {
   showEditModal = false;
   editData: EditCelebrantData | null = null;
   editingCelebrantId: string | null = null;
+
+  showWhatsappSettings = false;
+  whatsappNumber = '';
+  whatsappOptIn = false;
+  userProfile: UserProfile | null = null;
+  isSavingWhatsapp = false;
 
   editCelebrant(celebrant: Celebrant) {
     this.editingCelebrantId = celebrant.id || null;
@@ -92,6 +103,7 @@ export class CelebrantsComponent implements OnInit {
     private celebrantsService: CelebrantsService,
     private router: Router,
     private auth: Auth,
+    private authService: AuthService,
   ) { }
 
   ngOnInit(): void {
@@ -104,6 +116,36 @@ export class CelebrantsComponent implements OnInit {
         return a.birthDay - b.birthDay;
       }))
     );
+    this.loadUserProfile();
+  }
+
+  async loadUserProfile() {
+    const user = this.auth.currentUser;
+    if (user) {
+      this.userProfile = await this.authService.getUserProfile(user.uid);
+      if (this.userProfile) {
+        this.whatsappNumber = this.userProfile.whatsappNumber || '';
+        this.whatsappOptIn = this.userProfile.whatsappOptIn || false;
+      }
+    }
+  }
+
+  async saveWhatsappSettings() {
+    const user = this.auth.currentUser;
+    if (!user) return;
+    
+    this.isSavingWhatsapp = true;
+    try {
+      await this.authService.updateUserProfile(user.uid, {
+        whatsappNumber: this.whatsappNumber,
+        whatsappOptIn: this.whatsappOptIn
+      });
+      this.showWhatsappSettings = false;
+    } catch (error) {
+      console.error('Error saving WhatsApp settings:', error);
+    } finally {
+      this.isSavingWhatsapp = false;
+    }
   }
 
   async shortenUrl(longUrl: string): Promise<string> {
