@@ -9,8 +9,17 @@ import {
   onAuthStateChanged
 } from '@angular/fire/auth';
 import { User } from 'firebase/auth';
-import { Firestore, doc, setDoc } from '@angular/fire/firestore';
-import { BehaviorSubject } from 'rxjs';
+import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+
+export interface UserProfile {
+  userId: string;
+  email: string;
+  whatsappNumber?: string;
+  whatsappOptIn?: boolean;
+  createdAt: string;
+}
 
 
 @Injectable({ providedIn: 'root' })
@@ -48,5 +57,19 @@ export class AuthService {
 
   logout(): Promise<void> {
     return signOut(this.auth);
+  }
+
+  async getUserProfile(userId: string): Promise<UserProfile | null> {
+    const docRef = doc(this.firestore, 'users', userId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data() as UserProfile;
+    }
+    return null;
+  }
+
+  async updateUserProfile(userId: string, data: Partial<UserProfile>): Promise<void> {
+    const docRef = doc(this.firestore, 'users', userId);
+    await setDoc(docRef, { userId, ...data }, { merge: true });
   }
 }
