@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "prebuild": "node scripts/inject-env.js",
+    "prestart": "node scripts/inject-env.js",
     "prepreserve": "node scripts/inject-env.js",
     "postbuild": "node scripts/inject-env.js --restore",
     "start": "ng serve",
