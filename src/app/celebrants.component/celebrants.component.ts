@@ -15,6 +15,7 @@ import { map } from 'rxjs/operators';
 import { CelebrantsEditModalComponent, EditCelebrantData } from './celebrants-edit-modal.component';
 import { AuthService, UserProfile } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { MessagingService } from '../services/messaging.service';
 
 @Component({
   selector: 'app-celebrants',
@@ -104,6 +105,7 @@ export class CelebrantsComponent implements OnInit {
     private router: Router,
     private auth: Auth,
     private authService: AuthService,
+    private messagingService: MessagingService,
   ) { }
 
   ngOnInit(): void {
@@ -117,6 +119,7 @@ export class CelebrantsComponent implements OnInit {
       }))
     );
     this.loadUserProfile();
+    this.requestNotificationPermission();
   }
 
   async loadUserProfile() {
@@ -126,6 +129,19 @@ export class CelebrantsComponent implements OnInit {
       if (this.userProfile) {
         this.whatsappNumber = this.userProfile.whatsappNumber || '';
         this.whatsappOptIn = this.userProfile.whatsappOptIn || false;
+      }
+    }
+  }
+
+  private async requestNotificationPermission() {
+    const user = this.auth.currentUser;
+    if (!user) return;
+
+    const granted = await this.messagingService.requestPermission();
+    if (granted) {
+      const token = await this.messagingService.getFcmToken();
+      if (token) {
+        this.messagingService.registerTokenWithBackend(user.uid, token).subscribe();
       }
     }
   }
