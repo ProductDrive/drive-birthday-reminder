@@ -16,6 +16,7 @@ import { CelebrantsEditModalComponent, EditCelebrantData } from './celebrants-ed
 import { AuthService, UserProfile } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { MessagingService } from '../services/messaging.service';
+import { BirthdayCardService } from '../services/birthday-card.service';
 
 @Component({
   selector: 'app-celebrants',
@@ -106,6 +107,7 @@ export class CelebrantsComponent implements OnInit {
     private auth: Auth,
     private authService: AuthService,
     private messagingService: MessagingService,
+    private birthdayCardService: BirthdayCardService,
   ) { }
 
   ngOnInit(): void {
@@ -164,33 +166,33 @@ export class CelebrantsComponent implements OnInit {
     }
   }
 
-  async shortenUrl(longUrl: string): Promise<string> {
-    const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
-    return res.text();
-  }
-
   async sendWishes(celebrant: Celebrant) {
-    const defaultMessage = `Happy Birthday ${celebrant.name}! 🎉`;
+    try {
+      const blob = await this.birthdayCardService.generateCardBlob({
+        name: celebrant.name,
+        message: celebrant.message,
+      });
 
-    let pictureLink = '';
-    if (celebrant.pictureUrl) {
-      pictureLink = await this.shortenUrl(celebrant.pictureUrl);
+      const file = new File([blob], 'birthday-card.png', { type: 'image/png' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'Birthday Card',
+          files: [file],
+        });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `birthday-${celebrant.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      console.error('Failed to share card:', err);
+      alert('Could not generate birthday card. Please try again.');
     }
-
-    let fullMessage = '';
-
-    if (pictureLink && celebrant.message) {
-      fullMessage = `${celebrant.message}\n\n${pictureLink}`;
-    } else if (pictureLink && !celebrant.message) {
-      fullMessage = `${defaultMessage}\n\n${pictureLink}`;
-    } else if (!pictureLink && celebrant.message) {
-      fullMessage = celebrant.message;
-    } else {
-      fullMessage = defaultMessage;
-    }
-
-    const url = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
-    window.open(url, '_blank');
   }
 
   addCelebrant() {
