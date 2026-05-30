@@ -23,3 +23,19 @@ messaging.onBackgroundMessage((payload) => {
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) return cachedResponse;
+      return fetch(event.request).then((response) => {
+        return caches.open('birthday-reminder-v1').then((cache) => {
+          if (event.request.method === 'GET') {
+            cache.put(event.request, response.clone());
+          }
+          return response;
+        });
+      });
+    }),
+  );
+});
