@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
@@ -17,6 +18,7 @@ import { AuthService, UserProfile } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { MessagingService } from '../services/messaging.service';
 import { BirthdayCardService } from '../services/birthday-card.service';
+import { TemplateService, CardTemplate } from '../services/template.service';
 
 @Component({
   selector: 'app-celebrants',
@@ -30,6 +32,7 @@ import { BirthdayCardService } from '../services/birthday-card.service';
     MatInputModule,
     MatFormFieldModule,
     MatCheckboxModule,
+    MatSelectModule,
     FormsModule,
     CelebrantsEditModalComponent
   ],
@@ -46,6 +49,13 @@ export class CelebrantsComponent implements OnInit {
   whatsappOptIn = false;
   userProfile: UserProfile | null = null;
   isSavingWhatsapp = false;
+
+  templates$: Observable<CardTemplate[]>;
+  selectedTemplate = 'classic-balloon';
+  isSavingTemplate = false;
+
+  customMessages: Record<string, string> = {};
+  expandedCustomMessage: Record<string, boolean> = {};
 
   editCelebrant(celebrant: Celebrant) {
     this.editingCelebrantId = celebrant.id || null;
@@ -108,7 +118,10 @@ export class CelebrantsComponent implements OnInit {
     private authService: AuthService,
     private messagingService: MessagingService,
     private birthdayCardService: BirthdayCardService,
-  ) { }
+    private templateService: TemplateService,
+  ) {
+    this.templates$ = this.templateService.getTemplates();
+  }
 
   ngOnInit(): void {
     const user = this.auth.currentUser;
@@ -131,6 +144,7 @@ export class CelebrantsComponent implements OnInit {
       if (this.userProfile) {
         this.whatsappNumber = this.userProfile.whatsappNumber || '';
         this.whatsappOptIn = this.userProfile.whatsappOptIn || false;
+        this.selectedTemplate = this.userProfile.selectedTemplate || 'classic-balloon';
       }
     }
   }
@@ -166,12 +180,39 @@ export class CelebrantsComponent implements OnInit {
     }
   }
 
+  async onTemplateChange(templateShortName: string) {
+    this.selectedTemplate = templateShortName;
+    const user = this.auth.currentUser;
+    if (!user) return;
+    this.isSavingTemplate = true;
+    try {
+      await this.authService.updateUserProfile(user.uid, { selectedTemplate: templateShortName });
+    } catch (err) {
+      console.error('Failed to save template preference:', err);
+    } finally {
+      this.isSavingTemplate = false;
+    }
+  }
+
+  getTemplateCharLimit(): number {
+    return this.birthdayCardService.getMaxMessageLength(this.selectedTemplate);
+  }
+
+  getCustomMessageRemaining(celebrantId: string): number {
+    const len = (this.customMessages[celebrantId] || '').length;
+    return this.getTemplateCharLimit() - len;
+  }
+
   async sendWishes(celebrant: Celebrant) {
     try {
+      const custom = (this.customMessages[celebrant.id!] || '').trim();
       const blob = await this.birthdayCardService.generateCardBlob({
         name: celebrant.name,
-        message: celebrant.message,
-      });
+        message: custom || celebrant.message,
+      }, this.selectedTemplate);
+
+      delete this.customMessages[celebrant.id!];
+      delete this.expandedCustomMessage[celebrant.id!];
 
       const file = new File([blob], 'birthday-card.png', { type: 'image/png' });
 

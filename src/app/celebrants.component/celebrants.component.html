@@ -65,6 +65,21 @@
         </div>
       </div>
     </div>
+    <!-- Template Selector -->
+    <div class="mb-6 bg-white rounded-xl shadow-md p-4 border border-gray-100">
+      <div class="flex items-center gap-4 flex-wrap">
+        <span class="text-sm font-medium text-gray-700">Card Template:</span>
+        <select [ngModel]="selectedTemplate" (ngModelChange)="onTemplateChange($event)"
+                class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg text-sm
+                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          <option *ngFor="let t of templates$ | async" [value]="t.shortName">
+            {{ t.displayName }}
+          </option>
+        </select>
+        <span *ngIf="isSavingTemplate" class="text-xs text-gray-400">Saving...</span>
+      </div>
+    </div>
+
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10">
       <h2 class="text-4xl font-bold text-gray-800 tracking-tight">
         Celebrants
@@ -117,8 +132,37 @@
             🎂 Birthday: {{ formatBirthday(c.birthDay, c.birthMonth) }}
           </p>
 
+          <!-- Custom message -->
+          <div class="mt-3">
+            <button *ngIf="!expandedCustomMessage[c.id!]" (click)="expandedCustomMessage[c.id!] = true"
+                    class="text-xs text-gray-400 hover:text-blue-600 transition cursor-pointer flex items-center gap-1">
+              <span class="material-icons text-sm">edit_note</span>
+              Add custom message
+            </button>
+            <div *ngIf="expandedCustomMessage[c.id!]" class="space-y-2">
+              <textarea
+                [(ngModel)]="customMessages[c.id!]"
+                [maxlength]="getTemplateCharLimit()"
+                rows="2"
+                placeholder="Write a personal message..."
+                class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              ></textarea>
+              <div class="flex items-center justify-between">
+                <span class="text-xs"
+                      [class.text-red-500]="getCustomMessageRemaining(c.id!) < 20"
+                      [class.text-gray-400]="getCustomMessageRemaining(c.id!) >= 20">
+                  {{ getCustomMessageRemaining(c.id!) }} / {{ getTemplateCharLimit() }}
+                </span>
+                <button (click)="expandedCustomMessage[c.id!] = false; customMessages[c.id!] = ''"
+                        class="text-xs text-gray-400 hover:text-gray-600 transition cursor-pointer">
+                  Clear
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Action -->
-          <button (click)="sendWishes(c)" class="mt-5 w-full py-2.5 rounded-xl font-medium text-white
+          <button (click)="sendWishes(c)" class="mt-3 w-full py-2.5 rounded-xl font-medium text-white
                    bg-blue-600 hover:bg-blue-700
                    focus:ring-3 focus:ring-blue-300
                    active:scale-[0.98]
