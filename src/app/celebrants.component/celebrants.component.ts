@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
@@ -16,6 +17,8 @@ import { CelebrantsEditModalComponent, EditCelebrantData } from './celebrants-ed
 import { AuthService, UserProfile } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { MessagingService } from '../services/messaging.service';
+import { BirthdayCardService } from '../services/birthday-card.service';
+import { TemplateService, CardTemplate } from '../services/template.service';
 
 @Component({
   selector: 'app-celebrants',
@@ -29,6 +32,7 @@ import { MessagingService } from '../services/messaging.service';
     MatInputModule,
     MatFormFieldModule,
     MatCheckboxModule,
+    MatSelectModule,
     FormsModule,
     CelebrantsEditModalComponent
   ],
@@ -45,6 +49,13 @@ export class CelebrantsComponent implements OnInit {
   whatsappOptIn = false;
   userProfile: UserProfile | null = null;
   isSavingWhatsapp = false;
+
+  templates$: Observable<CardTemplate[]>;
+  selectedTemplate = 'classic-balloon';
+  isSavingTemplate = false;
+
+  customMessages: Record<string, string> = {};
+  expandedCustomMessage: Record<string, boolean> = {};
 
   editCelebrant(celebrant: Celebrant) {
     this.editingCelebrantId = celebrant.id || null;
@@ -106,7 +117,11 @@ export class CelebrantsComponent implements OnInit {
     private auth: Auth,
     private authService: AuthService,
     private messagingService: MessagingService,
-  ) { }
+    private birthdayCardService: BirthdayCardService,
+    private templateService: TemplateService,
+  ) {
+    this.templates$ = this.templateService.getTemplates();
+  }
 
   ngOnInit(): void {
     const user = this.auth.currentUser;
@@ -129,6 +144,7 @@ export class CelebrantsComponent implements OnInit {
       if (this.userProfile) {
         this.whatsappNumber = this.userProfile.whatsappNumber || '';
         this.whatsappOptIn = this.userProfile.whatsappOptIn || false;
+        this.selectedTemplate = this.userProfile.selectedTemplate || 'classic-balloon';
       }
     }
   }
@@ -164,33 +180,60 @@ export class CelebrantsComponent implements OnInit {
     }
   }
 
-  async shortenUrl(longUrl: string): Promise<string> {
-    const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
-    return res.text();
+  async onTemplateChange(templateShortName: string) {
+    this.selectedTemplate = templateShortName;
+    const user = this.auth.currentUser;
+    if (!user) return;
+    this.isSavingTemplate = true;
+    try {
+      await this.authService.updateUserProfile(user.uid, { selectedTemplate: templateShortName });
+    } catch (err) {
+      console.error('Failed to save template preference:', err);
+    } finally {
+      this.isSavingTemplate = false;
+    }
+  }
+
+  getTemplateCharLimit(): number {
+    return this.birthdayCardService.getMaxMessageLength(this.selectedTemplate);
+  }
+
+  getCustomMessageRemaining(celebrantId: string): number {
+    const len = (this.customMessages[celebrantId] || '').length;
+    return this.getTemplateCharLimit() - len;
   }
 
   async sendWishes(celebrant: Celebrant) {
-    const defaultMessage = `Happy Birthday ${celebrant.name}! 🎉`;
+    try {
+      const custom = (this.customMessages[celebrant.id!] || '').trim();
+      const blob = await this.birthdayCardService.generateCardBlob({
+        name: celebrant.name,
+        message: custom || celebrant.message,
+      }, this.selectedTemplate);
 
-    let pictureLink = '';
-    if (celebrant.pictureUrl) {
-      pictureLink = await this.shortenUrl(celebrant.pictureUrl);
+      delete this.customMessages[celebrant.id!];
+      delete this.expandedCustomMessage[celebrant.id!];
+
+      const file = new File([blob], 'birthday-card.png', { type: 'image/png' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'Birthday Card',
+          files: [file],
+        });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `birthday-${celebrant.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      console.error('Failed to share card:', err);
+      alert('Could not generate birthday card. Please try again.');
     }
-
-    let fullMessage = '';
-
-    if (pictureLink && celebrant.message) {
-      fullMessage = `${celebrant.message}\n\n${pictureLink}`;
-    } else if (pictureLink && !celebrant.message) {
-      fullMessage = `${defaultMessage}\n\n${pictureLink}`;
-    } else if (!pictureLink && celebrant.message) {
-      fullMessage = celebrant.message;
-    } else {
-      fullMessage = defaultMessage;
-    }
-
-    const url = `https://wa.me/?text=${encodeURIComponent(fullMessage)}`;
-    window.open(url, '_blank');
   }
 
   addCelebrant() {

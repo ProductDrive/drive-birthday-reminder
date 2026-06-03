@@ -18,6 +18,7 @@ export interface UserProfile {
   email: string;
   whatsappNumber?: string;
   whatsappOptIn?: boolean;
+  selectedTemplate?: string;
   createdAt: string;
 }
 
