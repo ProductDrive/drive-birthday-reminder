@@ -19,9 +19,9 @@ export class BirthdayCardService {
 
   private templates: Record<string, TemplateDef> = {
     'classic-balloon': { width: 600, height: 900, maxMessageLength: 150, builder: this.buildClassicBalloon },
-    'floral-elegant': { width: 850, height: 1200, maxMessageLength: 200, builder: this.buildFloralElegant },
+    'floral-elegant': { width: 850, height: 1200, maxMessageLength: 220, builder: this.buildFloralElegant },
     'golden-celebration': { width: 600, height: 900, maxMessageLength: 200, builder: this.buildGoldenCelebration },
-    'modern-minimal': { width: 600, height: 900, maxMessageLength: 250, builder: this.buildModernMinimal },
+    'modern-minimal': { width: 600, height: 900, maxMessageLength: 230, builder: this.buildModernMinimal },
   };
 
   getTemplateKeys(): string[] {
