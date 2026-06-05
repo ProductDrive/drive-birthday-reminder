@@ -55,6 +55,14 @@ fs.writeFileSync(envFile, content);
 console.log('Environment variables injected');
 
 if (fs.existsSync(swTemplate)) {
+  const swVersionFile = 'public/.swversion';
+  let swVersion = 1;
+  if (fs.existsSync(swVersionFile)) {
+    swVersion = parseInt(fs.readFileSync(swVersionFile, 'utf8').trim(), 10);
+  } else {
+    fs.writeFileSync(swVersionFile, '1');
+  }
+
   let swContent = fs.readFileSync(swTemplate, 'utf8');
   const swReplacements = {
     '__FIREBASE_API_KEY__': process.env.NG_APP_FIREBASE_API_KEY || '',
@@ -62,11 +70,15 @@ if (fs.existsSync(swTemplate)) {
     '__FIREBASE_PROJECT_ID__': process.env.NG_APP_FIREBASE_PROJECT_ID || '',
     '__FIREBASE_STORAGE_BUCKET__': process.env.NG_APP_FIREBASE_STORAGE_BUCKET || '',
     '__FIREBASE_MESSAGING_SENDER_ID__': process.env.NG_APP_FIREBASE_MESSAGING_SENDER_ID || '',
-    '__FIREBASE_APP_ID__': process.env.NG_APP_FIREBASE_APP_ID || ''
+    '__FIREBASE_APP_ID__': process.env.NG_APP_FIREBASE_APP_ID || '',
+    '__SW_VERSION__': swVersion.toString()
   };
   for (const [placeholder, value] of Object.entries(swReplacements)) {
     swContent = swContent.replace(placeholder, value);
   }
   fs.writeFileSync(swFile, swContent);
-  console.log('Service worker generated with Firebase config');
+  console.log(`Service worker generated with Firebase config (version ${swVersion})`);
+
+  fs.writeFileSync(swVersionFile, String(swVersion + 1));
+  console.log(`SW version bumped to ${swVersion + 1} for next build`);
 }
