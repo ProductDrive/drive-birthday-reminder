@@ -24,18 +24,54 @@ messaging.onBackgroundMessage((payload) => {
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
+const VERSION = __SW_VERSION__;
+const CACHE_NAME = `birthday-reminder-v${VERSION}`;
+const SW_VERSION_PARAM = 'swversion';
+
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    Promise.all([
+      caches.keys().then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key.startsWith('birthday-reminder-') && key !== CACHE_NAME)
+            .map((key) => caches.delete(key))
+        )
+      ),
+      self.clients.claim(),
+    ])
+  );
+});
+
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith('http')) return;
+
+  let fetchUrl = event.request.url;
+  const urlObj = new URL(fetchUrl);
+
+  if (urlObj.origin === self.location.origin) {
+    const separator = fetchUrl.includes('?') ? '&' : '?';
+    fetchUrl = `${fetchUrl}${separator}${SW_VERSION_PARAM}=${VERSION}`;
+  }
+
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
-      return fetch(event.request).then((response) => {
-        return caches.open('birthday-reminder-v1').then((cache) => {
-          if (event.request.method === 'GET') {
-            cache.put(event.request, response.clone());
-          }
-          return response;
-        });
-      });
-    }),
+    fetch(fetchUrl)
+      .then((response) => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, clone);
+          });
+        }
+        return response;
+      })
+      .catch(() =>
+        caches.match(event.request).then((cached) => cached || Response.error())
+      )
   );
 });

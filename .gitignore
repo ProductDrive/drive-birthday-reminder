@@ -54,3 +54,6 @@ src/environments
 # Generated service worker
 public/firebase-messaging-sw.js
 
+# Auto-incremented SW version (build artifact)
+public/.swversion
+
