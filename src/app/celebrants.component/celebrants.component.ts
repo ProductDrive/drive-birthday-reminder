@@ -126,12 +126,21 @@ export class CelebrantsComponent implements OnInit {
   ngOnInit(): void {
     const user = this.auth.currentUser;
     this.celebrants$ = this.celebrantsService.getCelebrants().pipe(
-      map((celebrants: Celebrant[]) => celebrants.slice().sort((a, b) => {
-        if (a.birthMonth !== b.birthMonth) {
-          return a.birthMonth - b.birthMonth;
-        }
-        return a.birthDay - b.birthDay;
-      }))
+      map((celebrants: Celebrant[]) => {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        return celebrants.slice().sort((a, b) => {
+          const nextA = new Date(currentYear, a.birthMonth - 1, a.birthDay);
+          const nextB = new Date(currentYear, b.birthMonth - 1, b.birthDay);
+
+          if (nextA < now) nextA.setFullYear(currentYear + 1);
+          if (nextB < now) nextB.setFullYear(currentYear + 1);
+
+          const diff = nextA.getTime() - nextB.getTime();
+          if (diff !== 0) return diff;
+          return a.name.localeCompare(b.name);
+        });
+      })
     );
     this.loadUserProfile();
     this.requestNotificationPermission();

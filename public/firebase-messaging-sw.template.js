@@ -54,7 +54,7 @@ self.addEventListener('fetch', (event) => {
   let fetchUrl = event.request.url;
   const urlObj = new URL(fetchUrl);
 
-  if (urlObj.origin === self.location.origin) {
+  if (urlObj.origin === self.location.origin && event.request.mode === 'navigate') {
     const separator = fetchUrl.includes('?') ? '&' : '?';
     fetchUrl = `${fetchUrl}${separator}${SW_VERSION_PARAM}=${VERSION}`;
   }
