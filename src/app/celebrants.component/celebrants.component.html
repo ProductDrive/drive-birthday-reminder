@@ -69,14 +69,13 @@
     <div class="mb-6 bg-white rounded-xl shadow-md p-4 border border-gray-100">
       <div class="flex items-center gap-4 flex-wrap">
         <span class="text-sm font-medium text-gray-700">Card Template:</span>
-        <select [ngModel]="selectedTemplate" (ngModelChange)="onTemplateChange($event)"
-                class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg text-sm
-                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
-          <option *ngFor="let t of templates$ | async" [value]="t.shortName">
-            {{ t.displayName }}
-          </option>
-        </select>
-        <span *ngIf="isSavingTemplate" class="text-xs text-gray-400">Saving...</span>
+        <span class="text-sm font-semibold text-blue-600">{{ selectedTemplateName }}</span>
+        <button (click)="viewAllTemplates()"
+                class="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600
+                       hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors whitespace-nowrap">
+          <mat-icon class="text-lg" aria-hidden="true">dashboard</mat-icon>
+          Show All Templates
+        </button>
       </div>
     </div>
 

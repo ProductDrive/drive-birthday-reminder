@@ -7,7 +7,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
@@ -18,7 +17,6 @@ import { AuthService, UserProfile } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { MessagingService } from '../services/messaging.service';
 import { BirthdayCardService } from '../services/birthday-card.service';
-import { TemplateService, CardTemplate } from '../services/template.service';
 
 @Component({
   selector: 'app-celebrants',
@@ -32,7 +30,6 @@ import { TemplateService, CardTemplate } from '../services/template.service';
     MatInputModule,
     MatFormFieldModule,
     MatCheckboxModule,
-    MatSelectModule,
     FormsModule,
     CelebrantsEditModalComponent
   ],
@@ -50,9 +47,7 @@ export class CelebrantsComponent implements OnInit {
   userProfile: UserProfile | null = null;
   isSavingWhatsapp = false;
 
-  templates$: Observable<CardTemplate[]>;
-  selectedTemplate = 'classic-balloon';
-  isSavingTemplate = false;
+  selectedTemplate = 'celebration-classic';
 
   customMessages: Record<string, string> = {};
   expandedCustomMessage: Record<string, boolean> = {};
@@ -106,6 +101,11 @@ export class CelebrantsComponent implements OnInit {
 
   celebrants$!: Observable<Celebrant[]>;
 
+  get selectedTemplateName(): string {
+    const info = this.birthdayCardService.getTemplateInfo(this.selectedTemplate);
+    return info ? `${info.emoji} ${info.displayName}` : this.selectedTemplate;
+  }
+
   get inviteLink(): string {
     const user = this.auth.currentUser;
     return user ? `${window.location.origin}/form/${user.uid}` : '';
@@ -118,10 +118,7 @@ export class CelebrantsComponent implements OnInit {
     private authService: AuthService,
     private messagingService: MessagingService,
     private birthdayCardService: BirthdayCardService,
-    private templateService: TemplateService,
-  ) {
-    this.templates$ = this.templateService.getTemplates();
-  }
+  ) {}
 
   ngOnInit(): void {
     const user = this.auth.currentUser;
@@ -153,7 +150,7 @@ export class CelebrantsComponent implements OnInit {
       if (this.userProfile) {
         this.whatsappNumber = this.userProfile.whatsappNumber || '';
         this.whatsappOptIn = this.userProfile.whatsappOptIn || false;
-        this.selectedTemplate = this.userProfile.selectedTemplate || 'classic-balloon';
+        this.selectedTemplate = this.userProfile.selectedTemplate || 'celebration-classic';
       }
     }
   }
@@ -186,20 +183,6 @@ export class CelebrantsComponent implements OnInit {
       console.error('Error saving WhatsApp settings:', error);
     } finally {
       this.isSavingWhatsapp = false;
-    }
-  }
-
-  async onTemplateChange(templateShortName: string) {
-    this.selectedTemplate = templateShortName;
-    const user = this.auth.currentUser;
-    if (!user) return;
-    this.isSavingTemplate = true;
-    try {
-      await this.authService.updateUserProfile(user.uid, { selectedTemplate: templateShortName });
-    } catch (err) {
-      console.error('Failed to save template preference:', err);
-    } finally {
-      this.isSavingTemplate = false;
     }
   }
 
@@ -270,5 +253,9 @@ export class CelebrantsComponent implements OnInit {
     }
     const link = `${window.location.origin}/form/${user?.uid}`;
     window.open(link, '_blank');
+  }
+
+  viewAllTemplates() {
+    this.router.navigate(['/templates']);
   }
 }
