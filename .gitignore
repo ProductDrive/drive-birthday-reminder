@@ -57,3 +57,4 @@ public/firebase-messaging-sw.js
 # Auto-incremented SW version (build artifact)
 public/.swversion
 
+firestore.rules
