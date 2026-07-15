@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Firestore, collection, addDoc } from '@angular/fire/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -10,6 +10,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+
+const DAYS_IN_MONTH: Record<number, number> = {
+  1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30,
+  7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31
+};
 
 @Component({
   selector: 'app-birthday-form',
@@ -31,7 +36,42 @@ export class BirthdayFormComponent implements OnInit {
   userId!: string;
   file!: File | null;
   imagePreview: string | null = null;
-  submitted = false; // Track if the form was submitted
+  submitted = false;
+
+  days = Array.from({ length: 31 }, (_, i) => i + 1);
+  months = [
+    { value: 1, label: 'January' },
+    { value: 2, label: 'February' },
+    { value: 3, label: 'March' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'May' },
+    { value: 6, label: 'June' },
+    { value: 7, label: 'July' },
+    { value: 8, label: 'August' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'October' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'December' }
+  ];
+
+  get maxDaysInMonth(): number {
+    const month = this.birthdayForm?.get('birthMonth')?.value;
+    return month ? DAYS_IN_MONTH[month] : 31;
+  }
+
+  get showDayError(): boolean {
+    const dayCtrl = this.birthdayForm?.get('birthDay');
+    const monthCtrl = this.birthdayForm?.get('birthMonth');
+    return !!(dayCtrl?.touched && monthCtrl?.touched && dayCtrl?.errors?.['dayOutOfRange']);
+  }
+
+  private static validDayMonth(control: AbstractControl): ValidationErrors | null {
+    const day = control.get('birthDay')?.value;
+    const month = control.get('birthMonth')?.value;
+    if (!day || !month) return null;
+    const max = DAYS_IN_MONTH[month];
+    return day > max ? { dayOutOfRange: true } : null;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -47,6 +87,16 @@ export class BirthdayFormComponent implements OnInit {
       birthDay: ['', [Validators.required, Validators.min(1), Validators.max(31)]],
       birthMonth: ['', [Validators.required, Validators.min(1), Validators.max(12)]],
       pictureUrl: ['']
+    }, { validators: BirthdayFormComponent.validDayMonth });
+
+    this.birthdayForm.get('birthMonth')!.valueChanges.subscribe(() => {
+      const dayCtrl = this.birthdayForm.get('birthDay')!;
+      const monthCtrl = this.birthdayForm.get('birthMonth')!;
+      const month = monthCtrl.value;
+      if (month && dayCtrl.value > DAYS_IN_MONTH[month]) {
+        dayCtrl.setValue(DAYS_IN_MONTH[month]);
+      }
+      dayCtrl.updateValueAndValidity();
     });
   }
 
@@ -96,96 +146,3 @@ export class BirthdayFormComponent implements OnInit {
     return `${window.location.origin}/form/${this.userId}`;
   }
 }
-
-
-
-
-// import { Component, OnInit } from '@angular/core';
-// import { ActivatedRoute } from '@angular/router';
-// import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-// import { Firestore, collection, addDoc } from '@angular/fire/firestore';
-// import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
-// import { MatCardModule } from '@angular/material/card';
-// import { MatFormFieldModule } from '@angular/material/form-field';
-// import { MatInputModule } from '@angular/material/input';
-// import { MatButtonModule } from '@angular/material/button';
-// import { CommonModule } from '@angular/common';
-
-// @Component({
-//   selector: 'app-birthday-form',
-//   templateUrl: './birthday-form.component.html',
-//   styleUrls: ['./birthday-form.component.scss'],
-//   standalone: true,
-//   imports: [
-//     ReactiveFormsModule,
-//     MatCardModule,
-//     MatFormFieldModule,
-//     MatInputModule,
-//     MatButtonModule,
-//     CommonModule
-//   ]
-// })
-// export class BirthdayFormComponent implements OnInit {
-//   birthdayForm!: FormGroup;
-//   userId!: string;
-//   file!: File | null;
-//   imagePreview: string | null = null;
-
-//   constructor(
-//     private fb: FormBuilder,
-//     private route: ActivatedRoute,
-//     private firestore: Firestore
-//   ) {
-//     this.userId = this.route.snapshot.paramMap.get('userId') || '';
-//   }
-
-//   ngOnInit() {
-//     this.birthdayForm = this.fb.group({
-//       name: ['', Validators.required],
-//       birthDay: ['', [Validators.required, Validators.min(1), Validators.max(31)]],
-//       birthMonth: ['', [Validators.required, Validators.min(1), Validators.max(12)]],
-//       pictureUrl: ['']
-//     });
-//   }
-
-//   onFileSelected(event: any) {
-//     this.file = event.target.files[0];
-//     if (this.file) {
-//       const reader = new FileReader();
-//       reader.onload = () => {
-//         this.imagePreview = reader.result as string;
-//       };
-//       reader.readAsDataURL(this.file);
-//     }
-//   }
-
-//   async submitForm() {
-//     if (!this.birthdayForm.valid) return;
-
-//     let pictureUrl = this.birthdayForm.value.pictureUrl || '';
-
-//     if (this.file) {
-//       const storage = getStorage();
-//       const fileRef = ref(storage, `celebrants/${this.userId}/${Date.now()}_${this.file.name}`);
-//       await uploadBytes(fileRef, this.file);
-//       pictureUrl = await getDownloadURL(fileRef);
-//     }
-
-//     const coll = collection(this.firestore, 'celebrants');
-//     const formInput = {
-//       userId: this.userId,
-//       name: this.birthdayForm.value.name,
-//       birthDay: this.birthdayForm.value.birthDay,
-//       birthMonth: this.birthdayForm.value.birthMonth,
-//       pictureUrl
-//     };
-//     console.log('formInput',formInput);
-//     await addDoc(coll, formInput);
-
-//     alert('Thank you! Your birthday was submitted.');
-//     this.birthdayForm.reset();
-//     this.file = null;
-//     this.imagePreview = null;
-//   }
-// }

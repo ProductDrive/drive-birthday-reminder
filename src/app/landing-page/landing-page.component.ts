@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterModule, Router } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-landing-page',
@@ -7,4 +8,18 @@ import { RouterModule } from '@angular/router';
   imports: [RouterModule],
   templateUrl: './landing-page.component.html',
 })
-export class LandingPageComponent {}
+export class LandingPageComponent implements OnInit {
+  showIllustration = true;
+
+  constructor(private auth: Auth, private router: Router) {}
+
+  ngOnInit() {
+    if (this.auth.currentUser) {
+      this.router.navigate(['/celebrants']);
+    }
+  }
+
+  dismissIllustration() {
+    this.showIllustration = false;
+  }
+}

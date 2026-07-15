@@ -1,13 +1,13 @@
 export const environment = {
   production: true,
-  apiUrl: 'NG_APP_API_URL_PLACEHOLDER',
+  apiUrl: 'https://birthday.drivesolution.cloud',
   firebase: {
-    projectId: 'NG_APP_FIREBASE_PROJECT_ID_PLACEHOLDER',
-    appId: 'NG_APP_FIREBASE_APP_ID_PLACEHOLDER',
-    storageBucket: 'NG_APP_FIREBASE_STORAGE_BUCKET_PLACEHOLDER',
-    apiKey: 'NG_APP_FIREBASE_API_KEY_PLACEHOLDER',
-    authDomain: 'NG_APP_FIREBASE_AUTH_DOMAIN_PLACEHOLDER',
-    messagingSenderId: 'NG_APP_FIREBASE_MESSAGING_SENDER_ID_PLACEHOLDER',
-    vapidKey: 'NG_APP_FIREBASE_VAPID_KEY_PLACEHOLDER'
+    projectId: 'afebdayrem',
+    appId: '1:531316247978:web:96f441523b5bcacd622fd3',
+    storageBucket: 'afebdayrem.firebasestorage.app',
+    apiKey: 'AIzaSyBz0RAhWxrIvy5TLxC2exgLnNW12qbmHtw',
+    authDomain: 'afebdayrem.firebaseapp.com',
+    messagingSenderId: '531316247978',
+    vapidKey: 'BPdMPbpoNAHRdoUQ8qbOplyhzUr1t9hQBQaEzymZRSkaL5TrAcgx0C80i2GgzVeIe9TIR6cPVWzO8k3WpPjj_00'
   }
 };

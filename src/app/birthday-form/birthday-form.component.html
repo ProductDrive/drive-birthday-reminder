@@ -60,21 +60,31 @@
             <label class="block text-sm font-medium text-gray-600 mb-2">
               Day
             </label>
-            <input type="number" formControlName="birthDay" min="1" max="31" placeholder="1-31" class="w-full px-4 py-3 rounded-xl border-2 border-gray-300
+            <select formControlName="birthDay" class="w-full px-4 py-3 rounded-xl border-2 border-gray-300
                      focus:ring-3 focus:ring-blue-300 focus:border-blue-600 focus:border-2
-                     outline-none transition-all duration-200" />
+                     outline-none transition-all duration-200 bg-white">
+              <option value="" disabled>Day</option>
+              <option *ngFor="let d of days" [value]="d">{{ d }}</option>
+            </select>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-600 mb-2">
               Month
             </label>
-            <input type="number" formControlName="birthMonth" min="1" max="12" placeholder="1-12" class="w-full px-4 py-3 rounded-xl border-2 border-gray-300
+            <select formControlName="birthMonth" class="w-full px-4 py-3 rounded-xl border-2 border-gray-300
                      focus:ring-3 focus:ring-blue-300 focus:border-blue-600 focus:border-2
-                     outline-none transition-all duration-200" />
+                     outline-none transition-all duration-200 bg-white">
+              <option value="" disabled>Month</option>
+              <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+            </select>
           </div>
 
         </div>
+
+        <p *ngIf="showDayError" class="text-sm text-red-600 -mt-2">
+          Day {{ birthdayForm.get('birthDay')?.value }} is not valid for the selected month. Max: {{ maxDaysInMonth }}.
+        </p>
 
         <!-- Picture URL -->
         <div>

@@ -52,6 +52,9 @@ export class CelebrantsComponent implements OnInit {
   customMessages: Record<string, string> = {};
   expandedCustomMessage: Record<string, boolean> = {};
 
+  showTodayBanner = true;
+  todayCelebrants: Celebrant[] = [];
+
   editCelebrant(celebrant: Celebrant) {
     this.editingCelebrantId = celebrant.id || null;
     this.editData = {
@@ -122,8 +125,16 @@ export class CelebrantsComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.auth.currentUser;
+    const today = new Date();
+    const todayDay = today.getDate();
+    const todayMonth = today.getMonth() + 1;
+
     this.celebrants$ = this.celebrantsService.getCelebrants().pipe(
       map((celebrants: Celebrant[]) => {
+        this.todayCelebrants = celebrants.filter(
+          c => c.birthDay === todayDay && c.birthMonth === todayMonth
+        );
+
         const now = new Date();
         const currentYear = now.getFullYear();
         return celebrants.slice().sort((a, b) => {
@@ -141,6 +152,10 @@ export class CelebrantsComponent implements OnInit {
     );
     this.loadUserProfile();
     this.requestNotificationPermission();
+  }
+
+  dismissTodayBanner() {
+    this.showTodayBanner = false;
   }
 
   async loadUserProfile() {

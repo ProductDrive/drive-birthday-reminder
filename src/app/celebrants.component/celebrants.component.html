@@ -100,6 +100,36 @@
       </div>
     </div>
 
+    <!-- Today's Celebration Banner -->
+    <div *ngIf="showTodayBanner && todayCelebrants.length > 0"
+         class="mb-8 relative bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-2xl shadow-xl p-6 text-white overflow-hidden">
+      <button (click)="dismissTodayBanner()"
+        class="absolute top-3 right-3 w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-xl shadow-lg animate-bounce hover:bg-yellow-500 transition-colors cursor-pointer z-10"
+        title="Close">
+        🎂
+      </button>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div class="text-5xl">🎊</div>
+        <div>
+          <h3 class="text-xl font-bold">Today's Celebration!</h3>
+          <p class="text-pink-100 mt-1">
+            <span *ngIf="todayCelebrants.length === 1">
+              {{ todayCelebrants[0].name }} has a birthday today!
+            </span>
+            <span *ngIf="todayCelebrants.length > 1">
+              {{ todayCelebrants.length }} people have a birthday today!
+            </span>
+          </p>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <span *ngFor="let c of todayCelebrants"
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-sm font-medium">
+              🎂 {{ c.name }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Celebrants Grid -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
