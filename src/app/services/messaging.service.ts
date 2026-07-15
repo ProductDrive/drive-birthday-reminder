@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environment';
 import { Observable, Subject } from 'rxjs';
 
 export interface FcmMessage {
