@@ -8,13 +8,21 @@
       <div class="flex-row">
         <div class="input-group">
           <label>Day</label>
-          <input type="number" [(ngModel)]="localData.birthDay" name="birthDay" min="1" max="31" required />
+          <select [(ngModel)]="localData.birthDay" name="birthDay" (ngModelChange)="onMonthChange()" required>
+            <option *ngFor="let d of days" [value]="d">{{ d }}</option>
+          </select>
         </div>
         <div class="input-group">
           <label>Month</label>
-          <input type="number" [(ngModel)]="localData.birthMonth" name="birthMonth" min="1" max="12" required />
+          <select [(ngModel)]="localData.birthMonth" name="birthMonth" (ngModelChange)="onMonthChange()" required>
+            <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+          </select>
         </div>
       </div>
+
+      <p *ngIf="showDayError" class="day-error">
+        Day {{ localData.birthDay }} is not valid for the selected month. Max: {{ maxDaysInMonth }}.
+      </p>
 
       <label>Notification Type</label>
       <div class="notify-type-options">
@@ -49,7 +57,7 @@
 
       <div class="modal-actions">
         <button type="button" (click)="onClose()">Cancel</button>
-        <button type="submit" [disabled]="!editForm.form.valid">Save</button>
+        <button type="submit" [disabled]="!editForm.form.valid || isDateInvalid">Save</button>
       </div>
     </form>
   </div>

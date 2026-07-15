@@ -24,6 +24,11 @@ const NOTIFY_TIME_MAP: Record<number, string> = {
   2: '3days'
 };
 
+const DAYS_IN_MONTH: Record<number, number> = {
+  1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30,
+  7: 31, 8: 31, 9: 30, 10: 31, 11: 30, 12: 31
+};
+
 @Component({
   selector: 'app-celebrants-edit-modal',
   standalone: true,
@@ -47,6 +52,22 @@ export class CelebrantsEditModalComponent implements OnChanges {
     { label: '3 Days before', value: '3days' }
   ];
 
+  days = Array.from({ length: 31 }, (_, i) => i + 1);
+  months = [
+    { value: 1, label: 'January' },
+    { value: 2, label: 'February' },
+    { value: 3, label: 'March' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'May' },
+    { value: 6, label: 'June' },
+    { value: 7, label: 'July' },
+    { value: 8, label: 'August' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'October' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'December' }
+  ];
+
   localData: EditCelebrantData = {
     name: '',
     birthDay: 1,
@@ -54,6 +75,26 @@ export class CelebrantsEditModalComponent implements OnChanges {
     notificationType: [],
     notifyTimes: []
   };
+
+  get maxDaysInMonth(): number {
+    return this.localData.birthMonth ? DAYS_IN_MONTH[this.localData.birthMonth] : 31;
+  }
+
+  get showDayError(): boolean {
+    if (!this.localData.birthMonth || !this.localData.birthDay) return false;
+    return this.localData.birthDay > DAYS_IN_MONTH[this.localData.birthMonth];
+  }
+
+  get isDateInvalid(): boolean {
+    return this.showDayError;
+  }
+
+  onMonthChange() {
+    const max = DAYS_IN_MONTH[this.localData.birthMonth];
+    if (this.localData.birthDay > max) {
+      this.localData.birthDay = max;
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data'] && this.data) {
