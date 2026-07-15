@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const isRestore = process.argv.includes('--restore');
 
-const envFile = 'src/environments/environment.prod.ts';
+const envFile = 'src/environment.prod.ts';
 const swFile = 'public/firebase-messaging-sw.js';
 const swTemplate = 'public/firebase-messaging-sw.template.js';
 
