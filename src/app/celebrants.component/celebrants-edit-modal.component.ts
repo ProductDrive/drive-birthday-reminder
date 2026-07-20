@@ -81,25 +81,36 @@ export class CelebrantsEditModalComponent implements OnChanges {
   }
 
   get showDayError(): boolean {
-    if (!this.localData.birthMonth || !this.localData.birthDay) return false;
-    return this.localData.birthDay > DAYS_IN_MONTH[this.localData.birthMonth];
+    const day = Number(this.localData.birthDay);
+    const month = Number(this.localData.birthMonth);
+    if (!month || !day) return false;
+    return day > DAYS_IN_MONTH[month];
   }
 
   get isDateInvalid(): boolean {
+    const day = Number(this.localData.birthDay);
+    const month = Number(this.localData.birthMonth);
+    if (!Number.isInteger(day) || day < 1 || day > 31) return true;
+    if (!Number.isInteger(month) || month < 1 || month > 12) return true;
     return this.showDayError;
   }
 
+  onDayChange() {
+    this.localData.birthDay = Number(this.localData.birthDay);
+    this.localData.birthMonth = Number(this.localData.birthMonth);
+  }
+
   onMonthChange() {
-    const max = DAYS_IN_MONTH[this.localData.birthMonth];
-    if (this.localData.birthDay > max) {
-      this.localData.birthDay = max;
-    }
+    this.localData.birthMonth = Number(this.localData.birthMonth);
+    this.localData.birthDay = Number(this.localData.birthDay);
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data'] && this.data) {
       this.localData = {
         ...this.data,
+        birthDay: Number(this.data.birthDay),
+        birthMonth: Number(this.data.birthMonth),
         notificationType: this.normalizeNotificationType(this.data.notificationType),
         notifyTimes: this.normalizeNotifyTimes(this.data.notifyTimes)
       };
@@ -141,8 +152,8 @@ export class CelebrantsEditModalComponent implements OnChanges {
       next: (sub: any) => {
         this.localData = {
           name: sub.name,
-          birthDay: sub.birthDay,
-          birthMonth: sub.birthMonth,
+          birthDay: Number(sub.birthDay),
+          birthMonth: Number(sub.birthMonth),
           notificationType: this.normalizeNotificationType(sub.notificationTypes),
           notifyTimes: this.normalizeNotifyTimes(sub.notifyTimes),
           id: celebrantId
@@ -151,8 +162,8 @@ export class CelebrantsEditModalComponent implements OnChanges {
       error: () => {
         this.localData = {
           name: this.data?.name || '',
-          birthDay: this.data?.birthDay || 1,
-          birthMonth: this.data?.birthMonth || 1,
+          birthDay: Number(this.data?.birthDay) || 1,
+          birthMonth: Number(this.data?.birthMonth) || 1,
           notificationType: [],
           notifyTimes: [],
           id: celebrantId
@@ -209,17 +220,17 @@ export class CelebrantsEditModalComponent implements OnChanges {
       userId,
       celebrantId,
       name: this.localData.name,
-      birthDay: this.localData.birthDay,
-      birthMonth: this.localData.birthMonth,
+      birthDay: Number(this.localData.birthDay),
+      birthMonth: Number(this.localData.birthMonth),
       notificationTypes: this.toNumberArray(this.localData.notificationType),
       notifyTimes: this.toNotifyTimeNumbers(this.localData.notifyTimes)
     };
     this.notificationService.saveSubscription(payload).subscribe({
       next: () => {
-        this.save.emit({ ...this.localData, id: celebrantId });
+        this.save.emit({ ...this.localData, birthDay: Number(this.localData.birthDay), birthMonth: Number(this.localData.birthMonth), id: celebrantId });
       },
       error: () => {
-        this.save.emit({ ...this.localData, id: celebrantId });
+        this.save.emit({ ...this.localData, birthDay: Number(this.localData.birthDay), birthMonth: Number(this.localData.birthMonth), id: celebrantId });
       }
     });
   }
