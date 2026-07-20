@@ -8,14 +8,14 @@
       <div class="flex-row">
         <div class="input-group">
           <label>Day</label>
-          <select [(ngModel)]="localData.birthDay" name="birthDay" (ngModelChange)="onMonthChange()" required>
-            <option *ngFor="let d of days" [value]="d">{{ d }}</option>
+          <select [(ngModel)]="localData.birthDay" name="birthDay" (ngModelChange)="onDayChange()" required>
+            <option *ngFor="let d of days" [ngValue]="d">{{ d }}</option>
           </select>
         </div>
         <div class="input-group">
           <label>Month</label>
           <select [(ngModel)]="localData.birthMonth" name="birthMonth" (ngModelChange)="onMonthChange()" required>
-            <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+            <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
           </select>
         </div>
       </div>
