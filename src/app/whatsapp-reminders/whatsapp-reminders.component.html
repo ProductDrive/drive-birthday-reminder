@@ -1,0 +1,143 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-100 px-6 py-12">
+  <div class="max-w-5xl mx-auto">
+
+    <!-- OTP Gate -->
+    <div *ngIf="otpPending" class="flex items-center justify-center min-h-[60vh]">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 w-full max-w-md text-center">
+        <div class="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-5">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="w-7 h-7" />
+        </div>
+        <h1 class="text-xl font-bold text-gray-800 mb-2">WhatsApp Reminder Dashboard</h1>
+        <p class="text-sm text-gray-500 mb-6">Enter the OTP sent to your email to continue.</p>
+
+        <!-- Request OTP -->
+        <div *ngIf="!otpSent">
+          <button (click)="requestOtp()"
+                  [disabled]="otpLoading"
+                  class="w-full py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors disabled:opacity-50">
+            {{ otpLoading ? 'Sending...' : 'Send OTP' }}
+          </button>
+        </div>
+
+        <!-- Enter OTP -->
+        <div *ngIf="otpSent">
+          <div class="otp-inputs" (paste)="onOtpPaste($event)">
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+                   (input)="onOtpInput(0, $event)" (keydown)="onOtpKeydown(0, $event)" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+                   (input)="onOtpInput(1, $event)" (keydown)="onOtpKeydown(1, $event)" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+                   (input)="onOtpInput(2, $event)" (keydown)="onOtpKeydown(2, $event)" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+                   (input)="onOtpInput(3, $event)" (keydown)="onOtpKeydown(3, $event)" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+                   (input)="onOtpInput(4, $event)" (keydown)="onOtpKeydown(4, $event)" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code"
+                   (input)="onOtpInput(5, $event)" (keydown)="onOtpKeydown(5, $event)" />
+          </div>
+
+          <p *ngIf="otpError" class="text-red-500 text-sm mt-3">{{ otpError }}</p>
+
+          <button (click)="verifyOtp()"
+                  [disabled]="otpLoading"
+                  class="w-full py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors disabled:opacity-50 mt-4">
+            {{ otpLoading ? 'Verifying...' : 'Verify OTP' }}
+          </button>
+
+          <button (click)="requestOtp()"
+                  [disabled]="otpLoading"
+                  class="text-sm text-gray-400 hover:text-gray-600 mt-3 transition-colors">
+            Resend OTP
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subscriber List -->
+    <div *ngIf="!otpPending">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 tracking-tight">WhatsApp Reminders</h1>
+          <p class="text-sm text-gray-500 mt-1" *ngIf="!loading">
+            {{ subscribers.length }} user{{ subscribers.length !== 1 ? 's' : '' }} &middot;
+            {{ totalCelebrants }} upcoming birthday{{ totalCelebrants !== 1 ? 's' : '' }}
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button (click)="refresh()"
+                  [disabled]="loading"
+                  class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium
+                         bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors
+                         shadow-sm disabled:opacity-50">
+            <mat-icon class="text-base" [class.animate-spin]="loading">refresh</mat-icon>
+            Refresh
+          </button>
+          <button (click)="logout()"
+                  class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium
+                         bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
+            <mat-icon class="text-base">logout</mat-icon>
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-20 text-gray-400">
+        <mat-icon class="text-4xl animate-spin mb-3">refresh</mat-icon>
+        <p>Loading subscribers...</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="loadError && !loading" class="text-center py-20">
+        <p class="text-red-500 mb-3">{{ loadError }}</p>
+        <button (click)="refresh()" class="text-blue-600 hover:text-blue-700 font-medium text-sm">Try again</button>
+      </div>
+
+      <!-- Empty -->
+      <div *ngIf="!loading && !loadError && subscribers.length === 0" class="text-center py-20">
+        <mat-icon class="text-5xl text-gray-300 mb-3">notifications_off</mat-icon>
+        <p class="text-gray-500">No upcoming WhatsApp reminders right now.</p>
+      </div>
+
+      <!-- User Cards -->
+      <div *ngIf="!loading && !loadError" class="space-y-4">
+        <div *ngFor="let user of subscribers"
+             class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+
+          <!-- User Header -->
+          <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-50 bg-gray-50/50">
+            <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="" class="w-4 h-4" />
+            </div>
+            <div class="min-w-0">
+              <p class="font-semibold text-gray-800 truncate">{{ user.userName }}</p>
+              <p class="text-xs text-gray-400">{{ user.whatsappNumber }}</p>
+            </div>
+            <span class="ml-auto text-xs font-medium text-gray-400 bg-white border border-gray-200 rounded-full px-2.5 py-0.5 flex-shrink-0">
+              {{ user.celebrants.length }} celebrant{{ user.celebrants.length !== 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <!-- Celebrants -->
+          <div class="divide-y divide-gray-50">
+            <div *ngFor="let c of user.celebrants" class="px-5 py-3.5 flex items-center gap-4">
+              <div class="min-w-0 flex-1">
+                <p class="font-medium text-gray-800">{{ c.name }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">
+                  {{ formatBirthday(c.birthDay, c.birthMonth) }} &middot; {{ c.daysUntilBirthday }} day{{ c.daysUntilBirthday !== 1 ? 's' : '' }} away
+                </p>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <span class="text-xs font-medium text-blue-600 bg-blue-50 rounded-full px-2 py-0.5">
+                  {{ formatNotifyTime(c.notifyTime) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

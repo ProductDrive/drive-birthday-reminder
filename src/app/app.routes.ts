@@ -5,6 +5,7 @@ import { CelebrantsComponent } from './celebrants.component/celebrants.component
 import { BirthdayFormComponent } from './birthday-form/birthday-form.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { TemplatesGalleryComponent } from './templates-gallery/templates-gallery.component';
+import { WhatsappRemindersComponent } from './whatsapp-reminders/whatsapp-reminders.component';
 import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
@@ -13,4 +14,5 @@ export const routes: Routes = [
     { path: 'celebrants', component: CelebrantsComponent, canActivate: [authGuard] },
     { path: 'templates', component: TemplatesGalleryComponent, canActivate: [authGuard] },
     { path: 'form/:userId', component: BirthdayFormComponent },
+    { path: 'whatsapp-reminders', component: WhatsappRemindersComponent },
 ];

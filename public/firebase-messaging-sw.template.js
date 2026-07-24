@@ -59,8 +59,16 @@ self.addEventListener('fetch', (event) => {
     fetchUrl = `${fetchUrl}${separator}${SW_VERSION_PARAM}=${VERSION}`;
   }
 
+  const modifiedRequest = new Request(fetchUrl, {
+    method: event.request.method,
+    headers: event.request.headers,
+    body: event.request.body,
+    mode: event.request.mode,
+    credentials: event.request.credentials,
+  });
+
   event.respondWith(
-    fetch(fetchUrl)
+    fetch(modifiedRequest)
       .then((response) => {
         if (response.ok) {
           const clone = response.clone();
