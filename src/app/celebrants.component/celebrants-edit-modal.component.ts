@@ -15,7 +15,7 @@ export interface EditCelebrantData {
 
 const NOTIFICATION_TYPE_MAP: Record<number, string> = {
   0: 'email',
-  1: 'whatsapp'
+  3: 'whatsapp'
 };
 
 const NOTIFY_TIME_MAP: Record<number, string> = {
@@ -199,7 +199,7 @@ export class CelebrantsEditModalComponent implements OnChanges {
   private toNumberArray(types: string[]): number[] {
     return types.map(t => {
       if (t === 'email') return 0;
-      if (t === 'whatsapp') return 1;
+      if (t === 'whatsapp') return 3;
       return -1;
     }).filter(v => v >= 0);
   }
