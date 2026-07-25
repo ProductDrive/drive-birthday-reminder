@@ -97,7 +97,7 @@
       <!-- Empty -->
       <div *ngIf="!loading && !loadError && subscribers.length === 0" class="text-center py-20">
         <mat-icon class="text-5xl text-gray-300 mb-3">notifications_off</mat-icon>
-        <p class="text-gray-500">No upcoming WhatsApp reminders right now.</p>
+        <p class="text-gray-500">No WhatsApp subscribers found.</p>
       </div>
 
       <!-- User Cards -->
@@ -112,7 +112,7 @@
             </div>
             <div class="min-w-0">
               <p class="font-semibold text-gray-800 truncate">{{ user.userName }}</p>
-              <p class="text-xs text-gray-400">{{ user.whatsappNumber }}</p>
+              <p class="text-xs text-gray-400">{{ user.whatsappNumber || 'No WhatsApp number' }}</p>
             </div>
             <span class="ml-auto text-xs font-medium text-gray-400 bg-white border border-gray-200 rounded-full px-2.5 py-0.5 flex-shrink-0">
               {{ user.celebrants.length }} celebrant{{ user.celebrants.length !== 1 ? 's' : '' }}
@@ -121,7 +121,11 @@
 
           <!-- Celebrants -->
           <div class="divide-y divide-gray-50">
-            <div *ngFor="let c of user.celebrants" class="px-5 py-3.5 flex items-center gap-4">
+            <div *ngFor="let c of user.celebrants"
+                 (click)="user.whatsappNumber ? openWhatsapp(user.whatsappNumber, c.message) : null"
+                 [class.cursor-pointer]="user.whatsappNumber"
+                 [class.cursor-default]="!user.whatsappNumber"
+                 class="px-5 py-3.5 flex items-center gap-4 hover:bg-green-50/50 transition-colors">
               <div class="min-w-0 flex-1">
                 <p class="font-medium text-gray-800">{{ c.name }}</p>
                 <p class="text-xs text-gray-400 mt-0.5">
@@ -129,9 +133,12 @@
                 </p>
               </div>
               <div class="flex items-center gap-2 flex-shrink-0">
-                <span class="text-xs font-medium text-blue-600 bg-blue-50 rounded-full px-2 py-0.5">
+                <span class="text-xs font-medium text-blue-600 bg-blue-50 rounded-full px-2 py-0.5" *ngIf="c.notifyTime">
                   {{ formatNotifyTime(c.notifyTime) }}
                 </span>
+                <div *ngIf="user.whatsappNumber" class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="Send" class="w-4 h-4" />
+                </div>
               </div>
             </div>
           </div>
