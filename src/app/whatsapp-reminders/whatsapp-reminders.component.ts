@@ -200,6 +200,12 @@ export class WhatsappRemindersComponent implements OnInit {
     return map[nt] || nt;
   }
 
+  openWhatsapp(whatsappNumber: string, message: string): void {
+    const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/${cleanNumber}?text=${encodedMessage}`, '_blank');
+  }
+
   get totalCelebrants(): number {
     return this.subscribers.reduce((sum, s) => sum + s.celebrants.length, 0);
   }
