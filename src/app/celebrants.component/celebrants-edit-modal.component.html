@@ -3,7 +3,12 @@
     <h2>Edit Celebrant</h2>
     <form (ngSubmit)="onSave()" #editForm="ngForm">
       <label>Name</label>
-      <input type="text" [(ngModel)]="localData.name" name="name" required />
+      <input type="text" [(ngModel)]="localData.name" name="name" (blur)="onNameBlur()" required />
+
+      <label>Group <span class="group-optional">(optional)</span></label>
+      <input type="text" [(ngModel)]="localData.group" name="group" (blur)="onGroupBlur()" placeholder="e.g., Family" />
+      <p *ngIf="groupHasWhitespace" class="day-error">Group name must be a single word (no spaces).</p>
+      <p *ngIf="groupIsNumber" class="day-error">Group name cannot be a number.</p>
 
       <div class="flex-row">
         <div class="input-group">
@@ -57,7 +62,7 @@
 
       <div class="modal-actions">
         <button type="button" (click)="onClose()">Cancel</button>
-        <button type="submit" [disabled]="!editForm.form.valid || isDateInvalid">Save</button>
+        <button type="submit" [disabled]="!editForm.form.valid || isDateInvalid || isGroupInvalid">Save</button>
       </div>
     </form>
   </div>

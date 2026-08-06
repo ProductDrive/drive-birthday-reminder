@@ -18,6 +18,8 @@ import { FormsModule } from '@angular/forms';
 import { MessagingService } from '../services/messaging.service';
 import { BirthdayCardService } from '../services/birthday-card.service';
 
+const UNGROUPED_KEY = '__ungrouped__';
+
 @Component({
   selector: 'app-celebrants',
   standalone: true,
@@ -41,6 +43,13 @@ export class CelebrantsComponent implements OnInit {
   editData: EditCelebrantData | null = null;
   editingCelebrantId: string | null = null;
 
+  quickActionsOpen = false;
+
+  groups: string[] = [];
+  selectedGroup = 'all';
+  allCelebrants: Celebrant[] = [];
+  readonly ungroupedKey = UNGROUPED_KEY;
+
   showWhatsappSettings = false;
   whatsappNumber = '';
   whatsappOptIn = false;
@@ -62,6 +71,7 @@ export class CelebrantsComponent implements OnInit {
       name: celebrant.name,
       birthDay: celebrant.birthDay,
       birthMonth: celebrant.birthMonth,
+      group: celebrant.group || '',
       notificationType: [],
       notifyTimes: []
     };
@@ -88,7 +98,8 @@ export class CelebrantsComponent implements OnInit {
       await this.celebrantsService.updateCelebrant(this.editingCelebrantId, {
         name: data.name,
         birthDay: data.birthDay,
-        birthMonth: data.birthMonth
+        birthMonth: data.birthMonth,
+        group: data.group || ''
       });
     }
     this.closeEditModal();
@@ -137,7 +148,7 @@ export class CelebrantsComponent implements OnInit {
 
         const now = new Date();
         const currentYear = now.getFullYear();
-        return celebrants.slice().sort((a, b) => {
+        const sorted = celebrants.slice().sort((a, b) => {
           const nextA = new Date(currentYear, a.birthMonth - 1, a.birthDay);
           const nextB = new Date(currentYear, b.birthMonth - 1, b.birthDay);
 
@@ -148,6 +159,15 @@ export class CelebrantsComponent implements OnInit {
           if (diff !== 0) return diff;
           return a.name.localeCompare(b.name);
         });
+
+        this.allCelebrants = sorted;
+        const groupSet = new Set<string>();
+        sorted.forEach(c => {
+          if (c.group && c.group.trim()) groupSet.add(c.group.trim());
+        });
+        this.groups = Array.from(groupSet).sort((a, b) => a.localeCompare(b));
+
+        return sorted;
       })
     );
     this.loadUserProfile();
@@ -156,6 +176,49 @@ export class CelebrantsComponent implements OnInit {
 
   dismissTodayBanner() {
     this.showTodayBanner = false;
+  }
+
+  filterByGroup(groupKey: string) {
+    this.selectedGroup = groupKey;
+  }
+
+  getCelebrantsInGroup(group: string): Celebrant[] {
+    return this.allCelebrants.filter(c => (c.group?.trim() || '') === group);
+  }
+
+  getUngroupedCelebrants(): Celebrant[] {
+    return this.allCelebrants.filter(c => !c.group || !c.group.trim());
+  }
+
+  get hasUngrouped(): boolean {
+    return this.getUngroupedCelebrants().length > 0;
+  }
+
+  get visibleSections(): { label: string; celebrants: Celebrant[]; count: number }[] {
+    if (this.selectedGroup === 'all') return this.groupSections;
+    if (this.selectedGroup === UNGROUPED_KEY) {
+      const ungrouped = this.getUngroupedCelebrants();
+      return ungrouped.length
+        ? [{ label: 'Ungrouped', celebrants: ungrouped, count: ungrouped.length }]
+        : [];
+    }
+    const celebrants = this.getCelebrantsInGroup(this.selectedGroup);
+    return [{ label: this.selectedGroup, celebrants, count: celebrants.length }];
+  }
+
+  get groupSections(): { label: string; celebrants: Celebrant[]; count: number }[] {
+    const sections: { label: string; celebrants: Celebrant[]; count: number }[] = [];
+    for (const g of this.groups) {
+      const celebrants = this.getCelebrantsInGroup(g);
+      if (celebrants.length) {
+        sections.push({ label: g, celebrants, count: celebrants.length });
+      }
+    }
+    const ungrouped = this.getUngroupedCelebrants();
+    if (ungrouped.length) {
+      sections.push({ label: 'Ungrouped', celebrants: ungrouped, count: ungrouped.length });
+    }
+    return sections;
   }
 
   async loadUserProfile() {

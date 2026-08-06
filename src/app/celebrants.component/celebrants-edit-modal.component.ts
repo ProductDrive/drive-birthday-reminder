@@ -3,12 +3,14 @@ import { NotificationService, SubscriptionPayload } from '../services/notificati
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Auth } from '@angular/fire/auth';
+import { toSentenceCase, isValidGroupName, hasWhitespace, isNumericOnly } from '../utils/string-utils';
 
 export interface EditCelebrantData {
   id?: string;
   name: string;
   birthDay: number;
   birthMonth: number;
+  group?: string;
   notificationType: string[];
   notifyTimes: string[];
 }
@@ -72,9 +74,34 @@ export class CelebrantsEditModalComponent implements OnChanges {
     name: '',
     birthDay: 1,
     birthMonth: 1,
+    group: '',
     notificationType: [],
     notifyTimes: []
   };
+
+  get groupHasWhitespace(): boolean {
+    return !!this.localData.group && hasWhitespace(this.localData.group);
+  }
+
+  get groupIsNumber(): boolean {
+    return !!this.localData.group && isNumericOnly(this.localData.group);
+  }
+
+  get isGroupInvalid(): boolean {
+    return !!this.localData.group && !isValidGroupName(this.localData.group);
+  }
+
+  onNameBlur() {
+    if (this.localData.name) {
+      this.localData.name = toSentenceCase(this.localData.name);
+    }
+  }
+
+  onGroupBlur() {
+    if (this.localData.group) {
+      this.localData.group = toSentenceCase(this.localData.group);
+    }
+  }
 
   get maxDaysInMonth(): number {
     return this.localData.birthMonth ? DAYS_IN_MONTH[this.localData.birthMonth] : 31;
@@ -154,6 +181,7 @@ export class CelebrantsEditModalComponent implements OnChanges {
           name: sub.name,
           birthDay: Number(sub.birthDay),
           birthMonth: Number(sub.birthMonth),
+          group: this.data?.group || '',
           notificationType: this.normalizeNotificationType(sub.notificationTypes),
           notifyTimes: this.normalizeNotifyTimes(sub.notifyTimes),
           id: celebrantId
@@ -164,6 +192,7 @@ export class CelebrantsEditModalComponent implements OnChanges {
           name: this.data?.name || '',
           birthDay: Number(this.data?.birthDay) || 1,
           birthMonth: Number(this.data?.birthMonth) || 1,
+          group: this.data?.group || '',
           notificationType: [],
           notifyTimes: [],
           id: celebrantId
@@ -219,7 +248,7 @@ export class CelebrantsEditModalComponent implements OnChanges {
     const payload: SubscriptionPayload = {
       userId,
       celebrantId,
-      name: this.localData.name,
+      name: toSentenceCase(this.localData.name),
       birthDay: Number(this.localData.birthDay),
       birthMonth: Number(this.localData.birthMonth),
       notificationTypes: this.toNumberArray(this.localData.notificationType),
@@ -227,10 +256,10 @@ export class CelebrantsEditModalComponent implements OnChanges {
     };
     this.notificationService.saveSubscription(payload).subscribe({
       next: () => {
-        this.save.emit({ ...this.localData, birthDay: Number(this.localData.birthDay), birthMonth: Number(this.localData.birthMonth), id: celebrantId });
+        this.save.emit({ ...this.localData, name: toSentenceCase(this.localData.name), group: this.localData.group ? toSentenceCase(this.localData.group) : '', birthDay: Number(this.localData.birthDay), birthMonth: Number(this.localData.birthMonth), id: celebrantId });
       },
       error: () => {
-        this.save.emit({ ...this.localData, birthDay: Number(this.localData.birthDay), birthMonth: Number(this.localData.birthMonth), id: celebrantId });
+        this.save.emit({ ...this.localData, name: toSentenceCase(this.localData.name), group: this.localData.group ? toSentenceCase(this.localData.group) : '', birthDay: Number(this.localData.birthDay), birthMonth: Number(this.localData.birthMonth), id: celebrantId });
       }
     });
   }
