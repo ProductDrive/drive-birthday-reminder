@@ -10,6 +10,7 @@ export interface Celebrant {
   birthMonth: number;
   pictureUrl?: string;
   message?: string;
+  group?: string;
   userId: string;
 }
 

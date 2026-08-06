@@ -50,7 +50,26 @@
           </label>
           <input type="text" formControlName="name" placeholder="Enter your full name" class="w-full px-4 py-3 rounded-xl border-2 border-gray-300
                    focus:ring-3 focus:ring-blue-300 focus:border-blue-600 focus:border-2
-                   outline-none transition-all duration-200" />
+                   outline-none transition-all duration-200" (blur)="onNameBlur()" />
+        </div>
+
+        <!-- Group -->
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-2">
+            Group <span class="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input type="text" formControlName="group" placeholder="e.g., Family" class="w-full px-4 py-3 rounded-xl border-2 border-gray-300
+                   focus:ring-3 focus:ring-blue-300 focus:border-blue-600 focus:border-2
+                   outline-none transition-all duration-200" (blur)="onGroupBlur()" />
+          <p *ngIf="groupHasWhitespace" class="text-sm text-red-600 mt-2">
+            Group name must be a single word (no spaces).
+          </p>
+          <p *ngIf="groupIsNumber" class="text-sm text-red-600 mt-2">
+            Group name cannot be a number.
+          </p>
+          <p *ngIf="!groupHasWhitespace && !groupIsNumber" class="text-xs text-gray-400 mt-2">
+            Optional — a single word, e.g. Family, Work, School.
+          </p>
         </div>
 
         <!-- Day & Month -->

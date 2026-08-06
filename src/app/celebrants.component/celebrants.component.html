@@ -9,101 +9,120 @@
 
   <div class="max-w-6xl mx-auto">
 
-    <!-- Quick Actions -->
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+    <!-- Quick Actions Accordion -->
+    <div class="bg-white rounded-xl shadow-md border border-gray-100 mb-10 overflow-hidden">
 
-      <!-- Share Link Card -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-100 p-5 flex flex-col">
-        <div class="flex items-center gap-3 mb-3">
+      <button (click)="quickActionsOpen = !quickActionsOpen"
+              class="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer text-left"
+              [attr.aria-expanded]="quickActionsOpen">
+        <div class="flex items-center gap-3">
           <div class="action-icon-circle bg-blue-50 text-blue-600">
-            <span class="material-icons">link</span>
+            <span class="material-icons">tune</span>
           </div>
           <div>
-            <h3 class="font-semibold text-gray-800">Share Your Link</h3>
-            <p class="text-xs text-gray-400">Collect birthdays from loved ones</p>
+            <h3 class="font-semibold text-gray-800">Quick Actions</h3>
+            <p class="text-xs text-gray-400">Share link, WhatsApp alerts, card template</p>
           </div>
         </div>
-        <p class="text-sm text-gray-500 mb-4">Send this link to your loved ones so they can add their birthday.</p>
-        <div class="mt-auto flex items-center gap-2">
-          <input class="copy-input flex-1" [value]="inviteLink" readonly placeholder="Invite link" />
-          <button class="copy-btn" (click)="copyInviteLink()" title="Copy invite link">
-            <span class="material-icons">content_copy</span>
-          </button>
-        </div>
-      </div>
+        <mat-icon class="text-gray-400 transition-transform duration-200" [class.rotate-180]="quickActionsOpen">expand_more</mat-icon>
+      </button>
 
-      <!-- WhatsApp Card -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-100 p-5 flex flex-col">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-3">
-            <div class="action-icon-circle bg-green-50">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="w-5 h-5" />
+      <div *ngIf="quickActionsOpen" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 p-5 border-t border-gray-100">
+
+        <!-- Share Link Card -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5 flex flex-col">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="action-icon-circle bg-blue-50 text-blue-600">
+              <span class="material-icons">link</span>
             </div>
             <div>
-              <h3 class="font-semibold text-gray-800">WhatsApp Alerts</h3>
-              <p class="text-xs text-gray-400">Get reminders via WhatsApp</p>
+              <h3 class="font-semibold text-gray-800">Share Your Link</h3>
+              <p class="text-xs text-gray-400">Collect birthdays from loved ones</p>
             </div>
           </div>
-        </div>
-        <p *ngIf="!whatsappOptIn" class="text-sm text-gray-500 mb-4">Receive birthday reminders straight to your WhatsApp.</p>
-        <p *ngIf="whatsappOptIn" class="text-sm text-green-600 mb-4">You're receiving WhatsApp notifications.</p>
-        <div class="mt-auto">
-          <button (click)="showWhatsappSettings = !showWhatsappSettings"
-                  class="w-full py-2 rounded-lg text-sm font-medium transition-colors"
-                  [ngClass]="whatsappOptIn
-                    ? 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'">
-            {{ showWhatsappSettings ? 'Cancel' : (whatsappOptIn ? 'Edit Settings' : 'Set Up') }}
-          </button>
-
-          <!-- Expandable Settings -->
-          <div *ngIf="showWhatsappSettings" class="mt-4 pt-4 border-t border-gray-100 space-y-3">
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Phone Number</label>
-              <input type="tel"
-                     [(ngModel)]="whatsappNumber"
-                     placeholder="e.g., +1234567890"
-                     class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-              <p class="text-xs text-gray-400 mt-1">Include country code</p>
-            </div>
-            <div class="flex items-center">
-              <input type="checkbox"
-                     [(ngModel)]="whatsappOptIn"
-                     id="whatsappOptIn"
-                     class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-              <label for="whatsappOptIn" class="ml-2 text-sm text-gray-600">
-                Enable WhatsApp reminders
-              </label>
-            </div>
-            <button (click)="saveWhatsappSettings()"
-                    [disabled]="isSavingWhatsapp"
-                    class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50">
-              {{ isSavingWhatsapp ? 'Saving...' : 'Save' }}
+          <p class="text-sm text-gray-500 mb-4">Send this link to your loved ones so they can add their birthday.</p>
+          <div class="mt-auto flex items-center gap-2">
+            <input class="copy-input flex-1" [value]="inviteLink" readonly placeholder="Invite link" />
+            <button class="copy-btn" (click)="copyInviteLink()" title="Copy invite link">
+              <span class="material-icons">content_copy</span>
             </button>
           </div>
         </div>
-      </div>
 
-      <!-- Card Template Card -->
-      <div class="bg-white rounded-xl shadow-md border border-gray-100 p-5 flex flex-col">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="action-icon-circle bg-purple-50 text-purple-600">
-            <span class="material-icons">palette</span>
+        <!-- WhatsApp Card -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5 flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class="action-icon-circle bg-green-50">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="w-5 h-5" />
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-800">WhatsApp Alerts</h3>
+                <p class="text-xs text-gray-400">Get reminders via WhatsApp</p>
+              </div>
+            </div>
           </div>
-          <div>
-            <h3 class="font-semibold text-gray-800">Card Template</h3>
-            <p class="text-xs text-gray-400">Customize your birthday cards</p>
+          <p *ngIf="!whatsappOptIn" class="text-sm text-gray-500 mb-4">Receive birthday reminders straight to your WhatsApp.</p>
+          <p *ngIf="whatsappOptIn" class="text-sm text-green-600 mb-4">You're receiving WhatsApp notifications.</p>
+          <div class="mt-auto">
+            <button (click)="showWhatsappSettings = !showWhatsappSettings"
+                    class="w-full py-2 rounded-lg text-sm font-medium transition-colors"
+                    [ngClass]="whatsappOptIn
+                      ? 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'">
+              {{ showWhatsappSettings ? 'Cancel' : (whatsappOptIn ? 'Edit Settings' : 'Set Up') }}
+            </button>
+
+            <!-- Expandable Settings -->
+            <div *ngIf="showWhatsappSettings" class="mt-4 pt-4 border-t border-gray-100 space-y-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Phone Number</label>
+                <input type="tel"
+                       [(ngModel)]="whatsappNumber"
+                       placeholder="e.g., +1234567890"
+                       class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                <p class="text-xs text-gray-400 mt-1">Include country code</p>
+              </div>
+              <div class="flex items-center">
+                <input type="checkbox"
+                       [(ngModel)]="whatsappOptIn"
+                       id="whatsappOptIn"
+                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                <label for="whatsappOptIn" class="ml-2 text-sm text-gray-600">
+                  Enable WhatsApp reminders
+                </label>
+              </div>
+              <button (click)="saveWhatsappSettings()"
+                      [disabled]="isSavingWhatsapp"
+                      class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50">
+                {{ isSavingWhatsapp ? 'Saving...' : 'Save' }}
+              </button>
+            </div>
           </div>
         </div>
-        <p class="text-sm text-gray-500 mb-1">Choose the look and feel of your birthday cards.</p>
-        <p class="text-sm font-medium text-purple-600 mb-4">{{ selectedTemplateName }}</p>
-        <div class="mt-auto">
-          <button (click)="viewAllTemplates()"
-                  class="w-full py-2 rounded-lg text-sm font-medium bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 transition-colors flex items-center justify-center gap-1.5">
-            <mat-icon class="text-base" aria-hidden="true">dashboard</mat-icon>
-            Browse Templates
-          </button>
+
+        <!-- Card Template Card -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5 flex flex-col">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="action-icon-circle bg-purple-50 text-purple-600">
+              <span class="material-icons">palette</span>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-800">Card Template</h3>
+              <p class="text-xs text-gray-400">Customize your birthday cards</p>
+            </div>
+          </div>
+          <p class="text-sm text-gray-500 mb-1">Choose the look and feel of your birthday cards.</p>
+          <p class="text-sm font-medium text-purple-600 mb-4">{{ selectedTemplateName }}</p>
+          <div class="mt-auto">
+            <button (click)="viewAllTemplates()"
+                    class="w-full py-2 rounded-lg text-sm font-medium bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 transition-colors flex items-center justify-center gap-1.5">
+              <mat-icon class="text-base" aria-hidden="true">dashboard</mat-icon>
+              Browse Templates
+            </button>
+          </div>
         </div>
+
       </div>
 
     </div>
@@ -159,80 +178,129 @@
       </div>
     </div>
 
-    <!-- Celebrants Grid -->
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <!-- Group Tabs -->
+    <div *ngIf="(celebrants$ | async) as allCelebrants">
+      <div *ngIf="allCelebrants.length > 0" class="flex gap-3 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+        <button (click)="filterByGroup('all')"
+                [class]="selectedGroup === 'all' ? 'group-tab active' : 'group-tab'">
+          All
+          <span class="group-tab-count">{{ allCelebrants.length }}</span>
+        </button>
+        <button *ngFor="let g of groups"
+                (click)="filterByGroup(g)"
+                [class]="selectedGroup === g ? 'group-tab active' : 'group-tab'">
+          {{ g }}
+          <span class="group-tab-count">{{ getCelebrantsInGroup(g).length }}</span>
+        </button>
+        <button *ngIf="hasUngrouped"
+                (click)="filterByGroup(ungroupedKey)"
+                [class]="selectedGroup === ungroupedKey ? 'group-tab active' : 'group-tab'">
+          Ungrouped
+          <span class="group-tab-count">{{ getUngroupedCelebrants().length }}</span>
+        </button>
+      </div>
+    </div>
 
-      <div *ngFor="let c of celebrants$ | async" class="bg-white rounded-2xl shadow-lg hover:shadow-2xl 
-               transition-all duration-300 overflow-hidden 
-               border border-gray-100 group">
-
-        <!-- Image -->
-        <div class="relative">
-          <img
-            [src]="c.pictureUrl || 'https://www.shutterstock.com/shutterstock/photos/2636458881/display_1500/stock-vector-avatar-man-icon-profile-placeholder-anonymous-user-male-grey-person-identity-icon-template-2636458881.jpg'"
-            alt="{{ c.name }}"
-            class="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-          <button class="absolute right-2 rounded-full p-2 bg-white/80 hover:bg-white text-gray-700 hover:text-blue-600 transition-all duration-200 edit-btn border border-gray-200 flex items-center justify-center"
-                  (click)="editCelebrant(c)" title="Edit celebrant">
-            <span class="material-icons" aria-hidden="true">edit</span>
-          </button>
-        </div>
-
-        <!-- Content -->
-        <div class="p-6">
-
-          <h3 class="text-xl font-semibold text-gray-800">
-            {{ c.name }}
-          </h3>
-
-          <p class="text-gray-500 text-sm mt-1">
-            🎂 Birthday: {{ formatBirthday(c.birthDay, c.birthMonth) }}
-          </p>
-
-          <!-- Custom message -->
-          <div class="mt-3">
-            <button *ngIf="!expandedCustomMessage[c.id!]" (click)="expandedCustomMessage[c.id!] = true"
-                    class="text-xs text-gray-400 hover:text-blue-600 transition cursor-pointer flex items-center gap-1">
-              <span class="material-icons text-sm">edit_note</span>
-              Add custom message
-            </button>
-            <div *ngIf="expandedCustomMessage[c.id!]" class="space-y-2">
-              <textarea
-                [(ngModel)]="customMessages[c.id!]"
-                [maxlength]="getTemplateCharLimit()"
-                rows="2"
-                placeholder="Write a personal message..."
-                class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-              ></textarea>
-              <div class="flex items-center justify-between">
-                <span class="text-xs"
-                      [class.text-red-500]="getCustomMessageRemaining(c.id!) < 20"
-                      [class.text-gray-400]="getCustomMessageRemaining(c.id!) >= 20">
-                  {{ getCustomMessageRemaining(c.id!) }} / {{ getTemplateCharLimit() }}
-                </span>
-                <button (click)="expandedCustomMessage[c.id!] = false; customMessages[c.id!] = ''"
-                        class="text-xs text-gray-400 hover:text-gray-600 transition cursor-pointer">
-                  Clear
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Action -->
-          <button (click)="sendWishes(c)" class="mt-3 w-full py-2.5 rounded-xl font-medium text-white
-                   bg-blue-600 hover:bg-blue-700
-                   focus:ring-3 focus:ring-blue-300
-                   active:scale-[0.98]
-                   transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
-            <mat-icon aria-hidden="true" class="text-lg">mail</mat-icon>
-            Send Wishes
-          </button>
-
-        </div>
-
+    <!-- Celebrants Grid (grouped) -->
+    <div *ngIf="(celebrants$ | async) as allCelebrants">
+      <div *ngIf="visibleSections.length === 0" class="text-center py-20">
+        <div class="text-6xl mb-4">🎂</div>
+        <h3 class="text-2xl font-semibold text-gray-700">No celebrants yet</h3>
+        <p class="text-gray-400 mt-2 mb-6">Add your first celebrant to start celebrating birthdays.</p>
+        <button (click)="addCelebrant()" class="inline-flex items-center px-4 py-2 rounded-full
+                 bg-blue-600 text-white font-medium hover:bg-blue-700
+                 focus:ring-3 focus:ring-blue-300 active:scale-95 transition-all duration-200">
+          <mat-icon class="mr-2" aria-hidden="true">add</mat-icon>
+          Add a celebrant
+        </button>
       </div>
 
+      <div *ngFor="let section of visibleSections" class="mb-10">
+        <div class="flex items-center gap-3 mb-5">
+          <h2 class="text-xl font-semibold text-gray-700">{{ section.label }}</h2>
+          <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
+            {{ section.count }} {{ section.count === 1 ? 'celebrant' : 'celebrants' }}
+          </span>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          <div *ngFor="let c of section.celebrants" class="bg-white rounded-2xl shadow-lg hover:shadow-2xl
+                   transition-all duration-300 overflow-hidden
+                   border border-gray-100 group">
+
+            <!-- Image -->
+            <div class="relative">
+              <img
+                [src]="c.pictureUrl || 'https://www.shutterstock.com/shutterstock/photos/2636458881/display_1500/stock-vector-avatar-man-icon-profile-placeholder-anonymous-user-male-grey-person-identity-icon-template-2636458881.jpg'"
+                alt="{{ c.name }}"
+                class="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+              <button class="absolute right-2 rounded-full p-2 bg-white/80 hover:bg-white text-gray-700 hover:text-blue-600 transition-all duration-200 edit-btn border border-gray-200 flex items-center justify-center"
+                      (click)="editCelebrant(c)" title="Edit celebrant">
+                <span class="material-icons" aria-hidden="true">edit</span>
+              </button>
+            </div>
+
+            <!-- Content -->
+            <div class="p-6">
+
+              <div class="flex items-start justify-between gap-2">
+                <h3 class="text-xl font-semibold text-gray-800">
+                  {{ c.name }}
+                </h3>
+                <span *ngIf="c.group" class="group-badge" title="Group">{{ c.group }}</span>
+              </div>
+
+              <p class="text-gray-500 text-sm mt-1">
+                🎂 Birthday: {{ formatBirthday(c.birthDay, c.birthMonth) }}
+              </p>
+
+              <!-- Custom message -->
+              <div class="mt-3">
+                <button *ngIf="!expandedCustomMessage[c.id!]" (click)="expandedCustomMessage[c.id!] = true"
+                        class="text-xs text-gray-400 hover:text-blue-600 transition cursor-pointer flex items-center gap-1">
+                  <span class="material-icons text-sm">edit_note</span>
+                  Add custom message
+                </button>
+                <div *ngIf="expandedCustomMessage[c.id!]" class="space-y-2">
+                  <textarea
+                    [(ngModel)]="customMessages[c.id!]"
+                    [maxlength]="getTemplateCharLimit()"
+                    rows="2"
+                    placeholder="Write a personal message..."
+                    class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  ></textarea>
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs"
+                          [class.text-red-500]="getCustomMessageRemaining(c.id!) < 20"
+                          [class.text-gray-400]="getCustomMessageRemaining(c.id!) >= 20">
+                      {{ getCustomMessageRemaining(c.id!) }} / {{ getTemplateCharLimit() }}
+                    </span>
+                    <button (click)="expandedCustomMessage[c.id!] = false; customMessages[c.id!] = ''"
+                            class="text-xs text-gray-400 hover:text-gray-600 transition cursor-pointer">
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action -->
+              <button (click)="sendWishes(c)" class="mt-3 w-full py-2.5 rounded-xl font-medium text-white
+                       bg-blue-600 hover:bg-blue-700
+                       focus:ring-3 focus:ring-blue-300
+                       active:scale-[0.98]
+                       transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                <mat-icon aria-hidden="true" class="text-lg">mail</mat-icon>
+                Send Wishes
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
     </div>
 
   </div>

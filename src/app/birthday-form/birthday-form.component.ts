@@ -4,6 +4,8 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators, 
 import { Firestore, collection, addDoc } from '@angular/fire/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
+import { toSentenceCase, isValidGroupName, hasWhitespace, isNumericOnly } from '../utils/string-utils';
+
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -73,6 +75,39 @@ export class BirthdayFormComponent implements OnInit {
     return day > max ? { dayOutOfRange: true } : null;
   }
 
+  private static validGroup(control: AbstractControl): ValidationErrors | null {
+    const value = control.value as string;
+    if (!value || !value.trim()) return null;
+    if (hasWhitespace(value)) return { groupHasWhitespace: true };
+    if (isNumericOnly(value)) return { groupIsNumber: true };
+    if (!isValidGroupName(value)) return { groupInvalid: true };
+    return null;
+  }
+
+  get groupHasWhitespace(): boolean {
+    const ctrl = this.birthdayForm?.get('group');
+    return !!(ctrl?.touched && ctrl?.errors?.['groupHasWhitespace']);
+  }
+
+  get groupIsNumber(): boolean {
+    const ctrl = this.birthdayForm?.get('group');
+    return !!(ctrl?.touched && ctrl?.errors?.['groupIsNumber']);
+  }
+
+  onNameBlur() {
+    const ctrl = this.birthdayForm?.get('name');
+    if (ctrl?.value) {
+      ctrl.setValue(toSentenceCase(ctrl.value));
+    }
+  }
+
+  onGroupBlur() {
+    const ctrl = this.birthdayForm?.get('group');
+    if (ctrl?.value) {
+      ctrl.setValue(toSentenceCase(ctrl.value));
+    }
+  }
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -86,7 +121,8 @@ export class BirthdayFormComponent implements OnInit {
       name: ['', Validators.required],
       birthDay: ['', [Validators.required, Validators.min(1), Validators.max(31)]],
       birthMonth: ['', [Validators.required, Validators.min(1), Validators.max(12)]],
-      pictureUrl: ['']
+      pictureUrl: [''],
+      group: ['', BirthdayFormComponent.validGroup]
     }, { validators: BirthdayFormComponent.validDayMonth });
 
     this.birthdayForm.get('birthMonth')!.valueChanges.subscribe(() => {
@@ -124,12 +160,14 @@ export class BirthdayFormComponent implements OnInit {
     }
 
     const coll = collection(this.firestore, 'celebrants');
+    const groupValue = this.birthdayForm.value.group;
     const formInput = {
       userId: this.userId,
-      name: this.birthdayForm.value.name,
+      name: toSentenceCase(this.birthdayForm.value.name),
       birthDay: this.birthdayForm.value.birthDay,
       birthMonth: this.birthdayForm.value.birthMonth,
-      pictureUrl
+      pictureUrl,
+      group: groupValue && groupValue.trim() ? toSentenceCase(groupValue) : ''
     };
 
     await addDoc(coll, formInput);
