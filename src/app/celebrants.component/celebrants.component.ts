@@ -20,6 +20,12 @@ import { BirthdayCardService } from '../services/birthday-card.service';
 
 const UNGROUPED_KEY = '__ungrouped__';
 
+interface CelebrantSection {
+  label: string;
+  count: number;
+  celebrants: Celebrant[];
+}
+
 @Component({
   selector: 'app-celebrants',
   standalone: true,
@@ -48,6 +54,9 @@ export class CelebrantsComponent implements OnInit {
   groups: string[] = [];
   selectedGroup = 'all';
   allCelebrants: Celebrant[] = [];
+  sections: CelebrantSection[] = [];
+  groupCounts: Record<string, number> = {};
+  ungroupedCount = 0;
   readonly ungroupedKey = UNGROUPED_KEY;
 
   showWhatsappSettings = false;
@@ -161,11 +170,32 @@ export class CelebrantsComponent implements OnInit {
         });
 
         this.allCelebrants = sorted;
-        const groupSet = new Set<string>();
+
+        const groupMap = new Map<string, Celebrant[]>();
+        const ungrouped: Celebrant[] = [];
         sorted.forEach(c => {
-          if (c.group && c.group.trim()) groupSet.add(c.group.trim());
+          const g = c.group?.trim();
+          if (g) {
+            if (!groupMap.has(g)) groupMap.set(g, []);
+            groupMap.get(g)!.push(c);
+          } else {
+            ungrouped.push(c);
+          }
         });
-        this.groups = Array.from(groupSet).sort((a, b) => a.localeCompare(b));
+
+        this.groups = Array.from(groupMap.keys()).sort((a, b) => a.localeCompare(b));
+        this.groupCounts = {};
+        groupMap.forEach((list, g) => { this.groupCounts[g] = list.length; });
+        this.ungroupedCount = ungrouped.length;
+
+        const grouped = this.groups.map(g => ({
+          label: g,
+          count: this.groupCounts[g],
+          celebrants: groupMap.get(g)!
+        }));
+        this.sections = ungrouped.length
+          ? [...grouped, { label: 'Ungrouped', count: ungrouped.length, celebrants: ungrouped }]
+          : grouped;
 
         return sorted;
       })
@@ -182,43 +212,22 @@ export class CelebrantsComponent implements OnInit {
     this.selectedGroup = groupKey;
   }
 
-  getCelebrantsInGroup(group: string): Celebrant[] {
-    return this.allCelebrants.filter(c => (c.group?.trim() || '') === group);
-  }
-
-  getUngroupedCelebrants(): Celebrant[] {
-    return this.allCelebrants.filter(c => !c.group || !c.group.trim());
-  }
-
   get hasUngrouped(): boolean {
-    return this.getUngroupedCelebrants().length > 0;
+    return this.ungroupedCount > 0;
   }
 
-  get visibleSections(): { label: string; celebrants: Celebrant[]; count: number }[] {
-    if (this.selectedGroup === 'all') return this.groupSections;
-    if (this.selectedGroup === UNGROUPED_KEY) {
-      const ungrouped = this.getUngroupedCelebrants();
-      return ungrouped.length
-        ? [{ label: 'Ungrouped', celebrants: ungrouped, count: ungrouped.length }]
-        : [];
-    }
-    const celebrants = this.getCelebrantsInGroup(this.selectedGroup);
-    return [{ label: this.selectedGroup, celebrants, count: celebrants.length }];
+  get visibleSections(): CelebrantSection[] {
+    if (this.selectedGroup === 'all') return this.sections;
+    const target = this.selectedGroup === UNGROUPED_KEY ? 'Ungrouped' : this.selectedGroup;
+    return this.sections.filter(s => s.label === target);
   }
 
-  get groupSections(): { label: string; celebrants: Celebrant[]; count: number }[] {
-    const sections: { label: string; celebrants: Celebrant[]; count: number }[] = [];
-    for (const g of this.groups) {
-      const celebrants = this.getCelebrantsInGroup(g);
-      if (celebrants.length) {
-        sections.push({ label: g, celebrants, count: celebrants.length });
-      }
-    }
-    const ungrouped = this.getUngroupedCelebrants();
-    if (ungrouped.length) {
-      sections.push({ label: 'Ungrouped', celebrants: ungrouped, count: ungrouped.length });
-    }
-    return sections;
+  trackBySection(_index: number, section: CelebrantSection): string {
+    return section.label;
+  }
+
+  trackByCelebrant(_index: number, celebrant: Celebrant): string {
+    return celebrant.id || '';
   }
 
   async loadUserProfile() {
