@@ -51,6 +51,9 @@ src/environments
 .env
 .env.prod
 
+# Planning / scratch notes
+response.md
+
 # Generated service worker
 public/firebase-messaging-sw.js
 
