@@ -164,8 +164,8 @@ export class BirthdayFormComponent implements OnInit {
     const formInput = {
       userId: this.userId,
       name: toSentenceCase(this.birthdayForm.value.name),
-      birthDay: this.birthdayForm.value.birthDay,
-      birthMonth: this.birthdayForm.value.birthMonth,
+      birthDay: Number(this.birthdayForm.value.birthDay),
+      birthMonth: Number(this.birthdayForm.value.birthMonth),
       pictureUrl,
       group: groupValue && groupValue.trim() ? toSentenceCase(groupValue) : ''
     };

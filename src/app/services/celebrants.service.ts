@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collectionData, collection,query, where } from '@angular/fire/firestore';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, of, switchMap, map } from 'rxjs';
 import { Auth,authState } from '@angular/fire/auth';
 
 export interface Celebrant {
@@ -32,7 +32,13 @@ export class CelebrantsService {
             console.log('has user',user);
           const coll = collection(this.firestore, 'celebrants');
           const userCelebrantsQuery = query(coll, where('userId', '==', user.uid));
-          return collectionData(userCelebrantsQuery, { idField: 'id' }) as Observable<Celebrant[]>;
+          return (collectionData(userCelebrantsQuery, { idField: 'id' }) as Observable<Celebrant[]>).pipe(
+            map(celebrants => celebrants.map(c => ({
+              ...c,
+              birthDay: Number(c.birthDay),
+              birthMonth: Number(c.birthMonth),
+            })))
+          );
         } else {
           return of([]);
         }

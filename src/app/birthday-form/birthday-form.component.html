@@ -83,7 +83,7 @@
                      focus:ring-3 focus:ring-blue-300 focus:border-blue-600 focus:border-2
                      outline-none transition-all duration-200 bg-white">
               <option value="" disabled>Day</option>
-              <option *ngFor="let d of days" [value]="d">{{ d }}</option>
+              <option *ngFor="let d of days" [ngValue]="d">{{ d }}</option>
             </select>
           </div>
 
@@ -95,7 +95,7 @@
                      focus:ring-3 focus:ring-blue-300 focus:border-blue-600 focus:border-2
                      outline-none transition-all duration-200 bg-white">
               <option value="" disabled>Month</option>
-              <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+              <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
             </select>
           </div>
 
