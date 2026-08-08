@@ -65,6 +65,11 @@ export class CelebrantsComponent implements OnInit {
   userProfile: UserProfile | null = null;
   isSavingWhatsapp = false;
 
+  showTemplateBanner = false;
+  showTemplatePrompt = false;
+  pendingWishCelebrant: Celebrant | null = null;
+  wishPromptConfirmed = false;
+
   selectedTemplate = 'celebration-classic';
 
   customMessages: Record<string, string> = {};
@@ -239,6 +244,20 @@ export class CelebrantsComponent implements OnInit {
         this.whatsappOptIn = this.userProfile.whatsappOptIn || false;
         this.selectedTemplate = this.userProfile.selectedTemplate || 'celebration-classic';
       }
+      const bannerDismissed = localStorage.getItem(this.templateBannerKey(user.uid)) === '1';
+      this.showTemplateBanner = !this.userProfile?.selectedTemplate && !bannerDismissed;
+    }
+  }
+
+  private templateBannerKey(uid: string): string {
+    return `birthdayalert:template-banner-dismissed:${uid}`;
+  }
+
+  dismissTemplateBanner() {
+    this.showTemplateBanner = false;
+    const user = this.auth.currentUser;
+    if (user) {
+      localStorage.setItem(this.templateBannerKey(user.uid), '1');
     }
   }
 
@@ -283,6 +302,36 @@ export class CelebrantsComponent implements OnInit {
   }
 
   async sendWishes(celebrant: Celebrant) {
+    if (!this.userProfile?.selectedTemplate && !this.wishPromptConfirmed) {
+      this.pendingWishCelebrant = celebrant;
+      this.showTemplatePrompt = true;
+      return;
+    }
+    await this.generateAndShareCard(celebrant);
+  }
+
+  pickTemplateFromPrompt() {
+    this.showTemplatePrompt = false;
+    this.pendingWishCelebrant = null;
+    this.viewAllTemplates();
+  }
+
+  sendWithDefaultTemplate() {
+    this.wishPromptConfirmed = true;
+    this.showTemplatePrompt = false;
+    const celebrant = this.pendingWishCelebrant;
+    this.pendingWishCelebrant = null;
+    if (celebrant) {
+      this.generateAndShareCard(celebrant);
+    }
+  }
+
+  cancelTemplatePrompt() {
+    this.showTemplatePrompt = false;
+    this.pendingWishCelebrant = null;
+  }
+
+  private async generateAndShareCard(celebrant: Celebrant) {
     try {
       const custom = (this.customMessages[celebrant.id!] || '').trim();
       const blob = await this.birthdayCardService.generateCardBlob({
