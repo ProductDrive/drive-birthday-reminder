@@ -9,6 +9,30 @@
 
   <div class="max-w-6xl mx-auto">
 
+    <!-- First-run Template Banner -->
+    <div *ngIf="showTemplateBanner"
+         class="mb-10 relative bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 rounded-2xl shadow-xl p-6 text-white overflow-hidden">
+      <button (click)="dismissTemplateBanner()"
+              class="absolute top-3 right-3 w-9 h-9 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors cursor-pointer"
+              title="Dismiss">
+        <mat-icon class="text-lg" aria-hidden="true">close</mat-icon>
+      </button>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-3xl flex-shrink-0">🎨</div>
+        <div class="flex-1">
+          <h3 class="text-xl font-bold">Personalize your birthday cards</h3>
+          <p class="text-purple-100 mt-1">
+            Pick a card template that fits your style — your celebrants' birthday cards will use it automatically.
+          </p>
+        </div>
+        <button (click)="viewAllTemplates()"
+                class="px-5 py-2.5 rounded-xl bg-white text-purple-700 font-semibold text-sm hover:bg-purple-50 transition-colors shadow-md flex items-center justify-center gap-1.5 flex-shrink-0">
+          <mat-icon class="text-base" aria-hidden="true">palette</mat-icon>
+          Choose a Template
+        </button>
+      </div>
+    </div>
+
     <!-- Quick Actions Accordion -->
     <div class="bg-white rounded-xl shadow-md border border-gray-100 mb-10 overflow-hidden">
 
@@ -305,4 +329,31 @@
 
   </div>
 
+</div>
+
+<!-- Send-time Template Prompt -->
+<div *ngIf="showTemplatePrompt"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+     (click)="cancelTemplatePrompt()">
+  <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md"
+       (click)="$event.stopPropagation()">
+    <div class="text-5xl mb-3 text-center">🎨</div>
+    <h3 class="text-xl font-bold text-gray-800 text-center">Pick a card template first</h3>
+    <p class="text-gray-500 text-sm mt-2 text-center">
+      You haven't chosen a card template yet. Pick one so
+      <span *ngIf="pendingWishCelebrant" class="font-medium text-gray-700">{{ pendingWishCelebrant.name }}</span>'s
+      birthday card has a look you love.
+    </p>
+    <div class="mt-6 space-y-3">
+      <button (click)="pickTemplateFromPrompt()"
+              class="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-md">
+        <mat-icon class="text-lg" aria-hidden="true">palette</mat-icon>
+        Choose a Template
+      </button>
+      <button (click)="sendWithDefaultTemplate()"
+              class="w-full py-2.5 rounded-xl font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors">
+        Send with default template
+      </button>
+    </div>
+  </div>
 </div>
