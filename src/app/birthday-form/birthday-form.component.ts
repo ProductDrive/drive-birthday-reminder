@@ -4,7 +4,7 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators, 
 import { Firestore, collection, addDoc } from '@angular/fire/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-import { toSentenceCase, isValidGroupName, hasWhitespace, isNumericOnly } from '../utils/string-utils';
+import { toSentenceCase, toTitleCase, isValidGroupName, hasWhitespace, isNumericOnly } from '../utils/string-utils';
 
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -97,7 +97,7 @@ export class BirthdayFormComponent implements OnInit {
   onNameBlur() {
     const ctrl = this.birthdayForm?.get('name');
     if (ctrl?.value) {
-      ctrl.setValue(toSentenceCase(ctrl.value));
+      ctrl.setValue(toTitleCase(ctrl.value));
     }
   }
 
@@ -163,7 +163,7 @@ export class BirthdayFormComponent implements OnInit {
     const groupValue = this.birthdayForm.value.group;
     const formInput = {
       userId: this.userId,
-      name: toSentenceCase(this.birthdayForm.value.name),
+      name: toTitleCase(this.birthdayForm.value.name),
       birthDay: Number(this.birthdayForm.value.birthDay),
       birthMonth: Number(this.birthdayForm.value.birthMonth),
       pictureUrl,
