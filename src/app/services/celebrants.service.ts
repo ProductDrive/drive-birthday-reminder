@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Firestore, collectionData, collection,query, where } from '@angular/fire/firestore';
 import { Observable, of, switchMap, map } from 'rxjs';
 import { Auth,authState } from '@angular/fire/auth';
+import { toTitleCase } from '../utils/string-utils';
 
 export interface Celebrant {
   id?: string;
@@ -35,6 +36,7 @@ export class CelebrantsService {
           return (collectionData(userCelebrantsQuery, { idField: 'id' }) as Observable<Celebrant[]>).pipe(
             map(celebrants => celebrants.map(c => ({
               ...c,
+              name: toTitleCase(c.name),
               birthDay: Number(c.birthDay),
               birthMonth: Number(c.birthMonth),
             })))

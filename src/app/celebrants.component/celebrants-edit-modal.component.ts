@@ -3,7 +3,7 @@ import { NotificationService, SubscriptionPayload } from '../services/notificati
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Auth } from '@angular/fire/auth';
-import { toSentenceCase, isValidGroupName, hasWhitespace, isNumericOnly } from '../utils/string-utils';
+import { toSentenceCase, toTitleCase, isValidGroupName, hasWhitespace, isNumericOnly } from '../utils/string-utils';
 
 export interface EditCelebrantData {
   id?: string;
@@ -93,7 +93,7 @@ export class CelebrantsEditModalComponent implements OnChanges {
 
   onNameBlur() {
     if (this.localData.name) {
-      this.localData.name = toSentenceCase(this.localData.name);
+      this.localData.name = toTitleCase(this.localData.name);
     }
   }
 
@@ -248,7 +248,7 @@ export class CelebrantsEditModalComponent implements OnChanges {
     const payload: SubscriptionPayload = {
       userId,
       celebrantId,
-      name: toSentenceCase(this.localData.name),
+      name: toTitleCase(this.localData.name),
       birthDay: Number(this.localData.birthDay),
       birthMonth: Number(this.localData.birthMonth),
       notificationTypes: this.toNumberArray(this.localData.notificationType),
@@ -256,10 +256,10 @@ export class CelebrantsEditModalComponent implements OnChanges {
     };
     this.notificationService.saveSubscription(payload).subscribe({
       next: () => {
-        this.save.emit({ ...this.localData, name: toSentenceCase(this.localData.name), group: this.localData.group ? toSentenceCase(this.localData.group) : '', birthDay: Number(this.localData.birthDay), birthMonth: Number(this.localData.birthMonth), id: celebrantId });
+        this.save.emit({ ...this.localData, name: toTitleCase(this.localData.name), group: this.localData.group ? toSentenceCase(this.localData.group) : '', birthDay: Number(this.localData.birthDay), birthMonth: Number(this.localData.birthMonth), id: celebrantId });
       },
       error: () => {
-        this.save.emit({ ...this.localData, name: toSentenceCase(this.localData.name), group: this.localData.group ? toSentenceCase(this.localData.group) : '', birthDay: Number(this.localData.birthDay), birthMonth: Number(this.localData.birthMonth), id: celebrantId });
+        this.save.emit({ ...this.localData, name: toTitleCase(this.localData.name), group: this.localData.group ? toSentenceCase(this.localData.group) : '', birthDay: Number(this.localData.birthDay), birthMonth: Number(this.localData.birthMonth), id: celebrantId });
       }
     });
   }
