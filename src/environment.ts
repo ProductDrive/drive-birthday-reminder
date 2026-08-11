@@ -1,6 +1,7 @@
 export const environment = {
   production: false,
   apiUrl: process.env['NG_APP_API_URL'],
+  recaptchaSiteKey: process.env['NG_APP_RECAPTCHA_SITE_KEY'],
   firebase: {
     projectId: process.env['NG_APP_FIREBASE_PROJECT_ID'],
     appId: process.env['NG_APP_FIREBASE_APP_ID'],

@@ -11,6 +11,7 @@ if (isRestore) {
   const placeholderContent = `export const environment = {
   production: true,
   apiUrl: 'NG_APP_API_URL_PLACEHOLDER',
+  recaptchaSiteKey: 'NG_APP_RECAPTCHA_SITE_KEY_PLACEHOLDER',
   firebase: {
     projectId: 'NG_APP_FIREBASE_PROJECT_ID_PLACEHOLDER',
     appId: 'NG_APP_FIREBASE_APP_ID_PLACEHOLDER',
@@ -38,6 +39,7 @@ let content = fs.readFileSync(envFile, 'utf8');
 
 const replacements = {
   'NG_APP_API_URL_PLACEHOLDER': process.env.NG_APP_API_URL || '',
+  'NG_APP_RECAPTCHA_SITE_KEY_PLACEHOLDER': process.env.NG_APP_RECAPTCHA_SITE_KEY || '',
   'NG_APP_FIREBASE_PROJECT_ID_PLACEHOLDER': process.env.NG_APP_FIREBASE_PROJECT_ID || '',
   'NG_APP_FIREBASE_APP_ID_PLACEHOLDER': process.env.NG_APP_FIREBASE_APP_ID || '',
   'NG_APP_FIREBASE_STORAGE_BUCKET_PLACEHOLDER': process.env.NG_APP_FIREBASE_STORAGE_BUCKET || '',

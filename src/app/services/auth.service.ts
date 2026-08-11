@@ -4,6 +4,8 @@ import {
   Auth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
   signOut,
   UserCredential,
   onAuthStateChanged
@@ -37,13 +39,41 @@ export class AuthService {
 
   async signup(email: string, password: string) {
     const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-    const user = userCredential.user;
-    await setDoc(doc(this.firestore, 'users', user.uid), {
-      userId: user.uid,
-      email: user.email,
-      createdAt: new Date().toISOString()
-    });
-    return user;
+    // NOTE: The Firestore user profile is intentionally NOT created here.
+    // It is created only after the email is verified (see createUserProfileIfMissing),
+    // so unverified bot accounts leave no data footprint.
+    return userCredential.user;
+  }
+
+  async sendVerificationEmail(): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error('No signed-in user');
+    await sendEmailVerification(user);
+  }
+
+  async reloadUser(): Promise<void> {
+    await this.auth.currentUser?.reload();
+  }
+
+  get isEmailVerified(): boolean {
+    return !!this.auth.currentUser?.emailVerified;
+  }
+
+  async createUserProfileIfMissing(uid: string): Promise<UserProfile | null> {
+    const existing = await this.getUserProfile(uid);
+    if (existing) return existing;
+
+    const profile = {
+      userId: uid,
+      email: this.auth.currentUser?.email || '',
+      createdAt: new Date().toISOString(),
+    };
+    await this.updateUserProfile(uid, profile);
+    return this.getUserProfile(uid);
+  }
+
+  sendPasswordResetEmail(email: string): Promise<void> {
+    return sendPasswordResetEmail(this.auth, email);
   }
 
 
@@ -54,6 +84,12 @@ export class AuthService {
 
   getcurrentUser(): User | null {
     return this.userSubject.value;
+  }
+
+  async getIdToken(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    if (!user) return null;
+    return user.getIdToken();
   }
 
   logout(): Promise<void> {

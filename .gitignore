@@ -50,6 +50,11 @@ Thumbs.db
 src/environments
 .env
 .env.prod
+.env.staging
+
+# Planning / scratch notes
+response.md
+insertphoto.md
 
 # Planning / scratch notes
 response.md
