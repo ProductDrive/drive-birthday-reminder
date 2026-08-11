@@ -49,6 +49,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   website = '';
   readonly recaptchaSiteKey = environment.recaptchaSiteKey || '';
   captchaResponse = '';
+  captchaMode: 'v2' | 'v3' = 'v2';
   private recaptchaWidgetId: number | undefined;
   signupLockSeconds = 0;
 
@@ -77,7 +78,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.resetCaptcha();
   }
 
-  // ── reCAPTCHA v2 (conditional on a configured site key) ──────────────
+  // ── reCAPTCHA (auto-detects v2 checkbox vs v3) ────────────────────────
   private loadRecaptcha(): void {
     if (window.grecaptcha) {
       this.renderRecaptcha();
@@ -95,15 +96,47 @@ export class AuthComponent implements OnInit, OnDestroy {
     if (!this.recaptchaSiteKey || this.recaptchaWidgetId !== undefined || !window.grecaptcha) return;
     const container = document.getElementById('recaptcha-container');
     if (!container) return;
-    this.recaptchaWidgetId = window.grecaptcha.render(container, {
-      sitekey: this.recaptchaSiteKey,
-      callback: (token: string) => { this.captchaResponse = token; },
-      'expired-callback': () => { this.captchaResponse = ''; },
+    try {
+      this.recaptchaWidgetId = window.grecaptcha.render(container, {
+        sitekey: this.recaptchaSiteKey,
+        callback: (token: string) => { this.captchaResponse = token; },
+        'expired-callback': () => { this.captchaResponse = ''; },
+      });
+    } catch {
+      this.fallbackToV3();
+      return;
+    }
+    // A v3 key won't render a widget; the container shows "Invalid key type".
+    setTimeout(() => {
+      if (!this.captchaResponse && container.textContent?.includes('Invalid key type')) {
+        this.fallbackToV3();
+      }
+    }, 1500);
+  }
+
+  private fallbackToV3(): void {
+    this.captchaMode = 'v3';
+    const container = document.getElementById('recaptcha-container');
+    if (container) container.innerHTML = '';
+    this.captchaResponse = '';
+  }
+
+  private getV3Token(): Promise<string> {
+    if (!window.grecaptcha || !this.recaptchaSiteKey) return Promise.resolve('');
+    return new Promise((resolve) => {
+      window.grecaptcha.ready(async () => {
+        try {
+          resolve(await window.grecaptcha.execute(this.recaptchaSiteKey, { action: 'submit' }));
+        } catch {
+          resolve('');
+        }
+      });
     });
   }
 
   private resetCaptcha(): void {
     this.captchaResponse = '';
+    if (this.captchaMode === 'v3') return;
     if (this.recaptchaWidgetId !== undefined && window.grecaptcha) {
       window.grecaptcha.reset(this.recaptchaWidgetId);
     }
@@ -145,9 +178,17 @@ export class AuthComponent implements OnInit, OnDestroy {
     // Honeypot: bots fill hidden fields; silently drop.
     if (this.website) return;
 
-    if (this.recaptchaSiteKey && !this.captchaResponse) {
-      this.message = '⚠️ Please complete the "I\'m not a robot" check first.';
-      return;
+    if (this.recaptchaSiteKey) {
+      if (this.captchaMode === 'v3') {
+        this.captchaResponse = await this.getV3Token();
+        if (!this.captchaResponse) {
+          this.message = '⚠️ Could not complete the bot check. Please try again.';
+          return;
+        }
+      } else if (!this.captchaResponse) {
+        this.message = '⚠️ Please complete the "I\'m not a robot" check first.';
+        return;
+      }
     }
 
     try {

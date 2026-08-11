@@ -123,7 +123,7 @@
         </div>
 
         <!-- reCAPTCHA -->
-        <div *ngIf="recaptchaSiteKey" class="mb-5 flex justify-center">
+        <div *ngIf="recaptchaSiteKey && captchaMode !== 'v3'" class="mb-5 flex justify-center">
           <div id="recaptcha-container"></div>
         </div>
 
