@@ -11,6 +11,8 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { environment } from '../../environment';
+import { NotificationService } from '../services/notification.service';
+import { firstValueFrom } from 'rxjs';
 
 const SIGNUP_MAX_ATTEMPTS = 3;
 const SIGNUP_LOCK_MS = 60 * 1000;
@@ -49,11 +51,15 @@ export class AuthComponent implements OnInit, OnDestroy {
   website = '';
   readonly recaptchaSiteKey = environment.recaptchaSiteKey || '';
   captchaResponse = '';
-  captchaMode: 'v2' | 'v3' = 'v2';
-  private recaptchaWidgetId: number | undefined;
+  private recaptchaReady = false;
   signupLockSeconds = 0;
 
-  constructor(private authService: AuthService, private router: Router, private auth: Auth) {}
+  constructor(
+    private authService: AuthService,
+    private notificationService: NotificationService,
+    private router: Router,
+    private auth: Auth
+  ) {}
 
   ngOnInit() {
     // If already logged in (and verified), redirect to celebrants
@@ -78,68 +84,33 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.resetCaptcha();
   }
 
-  // ── reCAPTCHA (auto-detects v2 checkbox vs v3) ────────────────────────
+  // ── reCAPTCHA Enterprise (score-based, invisible) ─────────────────────
   private loadRecaptcha(): void {
-    if (window.grecaptcha) {
-      this.renderRecaptcha();
+    if (window.grecaptcha?.enterprise) {
+      this.recaptchaReady = true;
       return;
     }
-    (window as any).onRecaptchaLoaded = () => this.renderRecaptcha();
+    (window as any).onRecaptchaLoaded = () => { this.recaptchaReady = true; };
     const script = document.createElement('script');
-    script.src = 'https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoaded&render=explicit';
+    script.src = `https://www.google.com/recaptcha/enterprise.js?render=${this.recaptchaSiteKey}`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
   }
 
-  private renderRecaptcha(): void {
-    if (!this.recaptchaSiteKey || this.recaptchaWidgetId !== undefined || !window.grecaptcha) return;
-    const container = document.getElementById('recaptcha-container');
-    if (!container) return;
-    try {
-      this.recaptchaWidgetId = window.grecaptcha.render(container, {
-        sitekey: this.recaptchaSiteKey,
-        callback: (token: string) => { this.captchaResponse = token; },
-        'expired-callback': () => { this.captchaResponse = ''; },
-      });
-    } catch {
-      this.fallbackToV3();
-      return;
+  private async getRecaptchaToken(): Promise<string> {
+    if (!this.recaptchaReady || !window.grecaptcha?.enterprise || !this.recaptchaSiteKey) {
+      return '';
     }
-    // A v3 key won't render a widget; the container shows "Invalid key type".
-    setTimeout(() => {
-      if (!this.captchaResponse && container.textContent?.includes('Invalid key type')) {
-        this.fallbackToV3();
-      }
-    }, 1500);
-  }
-
-  private fallbackToV3(): void {
-    this.captchaMode = 'v3';
-    const container = document.getElementById('recaptcha-container');
-    if (container) container.innerHTML = '';
-    this.captchaResponse = '';
-  }
-
-  private getV3Token(): Promise<string> {
-    if (!window.grecaptcha || !this.recaptchaSiteKey) return Promise.resolve('');
-    return new Promise((resolve) => {
-      window.grecaptcha.ready(async () => {
-        try {
-          resolve(await window.grecaptcha.execute(this.recaptchaSiteKey, { action: 'submit' }));
-        } catch {
-          resolve('');
-        }
-      });
-    });
+    try {
+      return await window.grecaptcha.enterprise.execute(this.recaptchaSiteKey, { action: 'submit' });
+    } catch {
+      return '';
+    }
   }
 
   private resetCaptcha(): void {
     this.captchaResponse = '';
-    if (this.captchaMode === 'v3') return;
-    if (this.recaptchaWidgetId !== undefined && window.grecaptcha) {
-      window.grecaptcha.reset(this.recaptchaWidgetId);
-    }
   }
 
   // ── Signup rate limiting (client-side deterrent) ──────────────────────
@@ -179,14 +150,17 @@ export class AuthComponent implements OnInit, OnDestroy {
     if (this.website) return;
 
     if (this.recaptchaSiteKey) {
-      if (this.captchaMode === 'v3') {
-        this.captchaResponse = await this.getV3Token();
-        if (!this.captchaResponse) {
-          this.message = '⚠️ Could not complete the bot check. Please try again.';
-          return;
-        }
-      } else if (!this.captchaResponse) {
-        this.message = '⚠️ Please complete the "I\'m not a robot" check first.';
+      this.captchaResponse = await this.getRecaptchaToken();
+      if (!this.captchaResponse) {
+        this.message = '⚠️ Could not complete the bot check. Please try again.';
+        return;
+      }
+      // Server-side verification via the reCAPTCHA Enterprise assessments API.
+      const captchaResult = await firstValueFrom(
+        this.notificationService.verifyRecaptcha(this.captchaResponse)
+      ).catch(() => null);
+      if (!captchaResult || !captchaResult.valid) {
+        this.message = '⚠️ Bot check failed. Please try again.';
         return;
       }
     }

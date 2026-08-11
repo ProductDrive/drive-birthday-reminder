@@ -26,4 +26,8 @@ export class NotificationService {
   saveSubscription(payload: SubscriptionPayload): Observable<any> {
     return this.http.post(`${this.baseUrl}/api/birthday/subscribe`, payload);
   }
+
+  verifyRecaptcha(token: string): Observable<{ valid: boolean; score?: number }> {
+    return this.http.post<{ valid: boolean; score?: number }>(`${this.baseUrl}/api/birthday/verify-recaptcha`, { token });
+  }
 }
