@@ -50,6 +50,11 @@ Thumbs.db
 src/environments
 .env
 .env.prod
+.env.staging
+
+# Planning / scratch notes
+response.md
+insertphoto.md
 
 # Generated service worker
 public/firebase-messaging-sw.js

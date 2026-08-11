@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -8,6 +8,7 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { environment } from '../environment';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 // Angular Material modules
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,6 +33,7 @@ export const appConfig: ApplicationConfig = {
       MatButtonModule,
       MatIconModule,
       MatCardModule
-      ,provideHttpClient()
+      ,provideHttpClient(withInterceptorsFromDi()),
+      { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ]
 };

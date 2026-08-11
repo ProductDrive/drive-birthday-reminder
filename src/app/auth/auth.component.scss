@@ -2,6 +2,16 @@
 // @import '../../styles/mixins';
 // @import '../../styles/utils';
 
+.honeypot {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	opacity: 0;
+	pointer-events: none;
+}
+
 // .auth-container {
 //   @include flex-center;
 //   min-height: 100vh;
