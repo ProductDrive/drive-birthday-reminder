@@ -7,7 +7,10 @@ export class PwaInstallService {
   constructor() {
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
-      this.deferredPrompt.set(e);
+      if (!this.deferredPrompt()) {
+        this.deferredPrompt.set(e);
+        console.info('[PWA] install prompt captured; banner shown. Waiting for user to call prompt().');
+      }
     });
 
     window.addEventListener('appinstalled', () => {
@@ -18,9 +21,13 @@ export class PwaInstallService {
   async install(): Promise<void> {
     const prompt = this.deferredPrompt();
     if (!prompt) return;
-    (prompt as any).prompt();
-    const result = await (prompt as any).userChoice;
-    if (result.outcome === 'accepted') {
+    try {
+      (prompt as any).prompt();
+      const result = await (prompt as any).userChoice;
+      if (result?.outcome === 'accepted') {
+        this.deferredPrompt.set(null);
+      }
+    } catch {
       this.deferredPrompt.set(null);
     }
   }
