@@ -95,16 +95,20 @@ export class AuthComponent implements OnInit, OnDestroy {
     script.src = `https://www.google.com/recaptcha/enterprise.js?render=${this.recaptchaSiteKey}`;
     script.async = true;
     script.defer = true;
+    script.onerror = () => console.error('[reCAPTCHA] enterprise.js failed to load');
     document.head.appendChild(script);
   }
 
   private async getRecaptchaToken(): Promise<string> {
     if (!this.recaptchaReady || !window.grecaptcha?.enterprise || !this.recaptchaSiteKey) {
+      console.error('[reCAPTCHA] not ready (recaptchaReady=' + this.recaptchaReady +
+        ', enterprise=' + !!window.grecaptcha?.enterprise + ')');
       return '';
     }
     try {
       return await window.grecaptcha.enterprise.execute(this.recaptchaSiteKey, { action: 'submit' });
-    } catch {
+    } catch (err) {
+      console.error('[reCAPTCHA] execute failed:', err);
       return '';
     }
   }
