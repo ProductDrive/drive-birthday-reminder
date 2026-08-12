@@ -92,19 +92,28 @@ export class AuthComponent implements OnInit, OnDestroy {
     }
     (window as any).onRecaptchaLoaded = () => { this.recaptchaReady = true; };
     const script = document.createElement('script');
-    script.src = `https://www.google.com/recaptcha/enterprise.js?render=${this.recaptchaSiteKey}`;
+    script.src = `https://www.google.com/recaptcha/enterprise.js?onload=onRecaptchaLoaded&render=${this.recaptchaSiteKey}`;
     script.async = true;
     script.defer = true;
+    script.onerror = () => console.error('[reCAPTCHA] enterprise.js failed to load');
     document.head.appendChild(script);
   }
 
   private async getRecaptchaToken(): Promise<string> {
-    if (!this.recaptchaReady || !window.grecaptcha?.enterprise || !this.recaptchaSiteKey) {
+    if (!this.recaptchaSiteKey || !window.grecaptcha?.enterprise) {
+      console.error('[reCAPTCHA] script not loaded (enterprise=' + !!window.grecaptcha?.enterprise + ')');
       return '';
     }
     try {
+      if (!this.recaptchaReady) {
+        await Promise.race([
+          new Promise<void>((resolve) => window.grecaptcha.enterprise.ready(() => { this.recaptchaReady = true; resolve(); })),
+          new Promise<void>((_, reject) => setTimeout(() => reject(new Error('recaptcha ready timeout')), 5000))
+        ]);
+      }
       return await window.grecaptcha.enterprise.execute(this.recaptchaSiteKey, { action: 'submit' });
-    } catch {
+    } catch (err) {
+      console.error('[reCAPTCHA] execute failed:', err);
       return '';
     }
   }
