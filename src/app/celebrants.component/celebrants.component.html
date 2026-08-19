@@ -147,6 +147,31 @@
           </div>
         </div>
 
+        <!-- Logout Card -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5 flex flex-col">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="action-icon-circle bg-red-50 text-red-600">
+              <span class="material-icons">logout</span>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-800">Account</h3>
+              <p class="text-xs text-gray-400">Sign out or manage your account</p>
+            </div>
+          </div>
+          <p class="text-sm text-gray-500 mb-4">Sign out of your account on this device.</p>
+          <div class="mt-auto space-y-2">
+            <button (click)="logout()"
+                    class="w-full py-2 rounded-lg text-sm font-medium bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition-colors flex items-center justify-center gap-1.5">
+              <span class="material-icons text-base" aria-hidden="true">logout</span>
+              Sign Out
+            </button>
+            <button (click)="openDeletionConfirm()"
+                    class="w-full py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+              Request Account Deletion
+            </button>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -356,4 +381,57 @@
       </button>
     </div>
   </div>
+</div>
+
+<!-- Policy Acceptance Popup (existing users) -->
+<app-policies-popup
+  [open]="showPoliciesPopup"
+  [activeTab]="policiesPopupTab"
+  [showAcceptButton]="true"
+  (close)="openPoliciesPopup('privacy')"
+  (accepted)="acceptPolicies()">
+</app-policies-popup>
+
+<!-- Account Deletion Confirmation Modal -->
+<div *ngIf="showDeletionConfirm"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+     (click)="closeDeletionConfirm()">
+  <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md"
+       (click)="$event.stopPropagation()">
+    <div class="text-5xl mb-3 text-center">&#9888;&#65039;</div>
+    <h3 class="text-xl font-bold text-gray-800 text-center">Request Account Deletion</h3>
+    <p class="text-gray-500 text-sm mt-2 text-center">
+      This will send a deletion request to our team. Your account and data will be reviewed and deleted. This action cannot be undone.
+    </p>
+    <div class="mt-4">
+      <label class="block text-sm font-medium text-gray-600 mb-1">Reason (optional)</label>
+      <textarea [(ngModel)]="deletionReason"
+                rows="3"
+                placeholder="Tell us why you're leaving..."
+                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"></textarea>
+    </div>
+    <div class="mt-6 space-y-3">
+      <button (click)="requestAccountDeletion()"
+              [disabled]="isRequestingDeletion"
+              class="w-full py-3 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-md">
+        {{ isRequestingDeletion ? 'Sending Request...' : 'Confirm Deletion Request' }}
+      </button>
+      <button (click)="closeDeletionConfirm()"
+              class="w-full py-2.5 rounded-xl font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Deletion Requested Success Banner -->
+<div *ngIf="deletionRequested"
+     class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3">
+  <span class="font-medium">Deletion request submitted. We'll process it shortly.</span>
+  <button (click)="deletionRequested = false" class="text-white/80 hover:text-white">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  </button>
 </div>
