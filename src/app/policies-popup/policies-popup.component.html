@@ -1,0 +1,378 @@
+<div class="modal-backdrop" *ngIf="open" (click)="!showAcceptButton && onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="tabs">
+        <button [class.active]="activeTab === 'privacy'" (click)="switchTab('privacy')" class="tab-btn">
+          Privacy Policy
+        </button>
+        <button [class.active]="activeTab === 'cookies'" (click)="switchTab('cookies')" class="tab-btn">
+          Cookies Policy
+        </button>
+      </div>
+      <button *ngIf="!showAcceptButton" (click)="onClose()" class="close-btn" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body" [class.has-footer]="showAcceptButton">
+
+      <!-- Privacy Policy -->
+      <div *ngIf="activeTab === 'privacy'" class="policy-content">
+        <h1>Privacy Policy</h1>
+        <p class="last-updated"><strong>Last updated: 18 August 2026</strong></p>
+        <p>Birthday Wishes Alert ("Birthday Wishes Alert", "we", "us" or "our") respects your privacy and is committed to protecting your personal data.</p>
+        <p>This Privacy Policy explains how we collect, use, store and protect personal information when you use the Birthday Wishes Alert website and services.</p>
+        <p>Birthday Wishes Alert is operated by:</p>
+        <p><strong>PRODUCTDRIVE</strong><br><strong>Email:</strong> <a href="mailto:vergiorder@gmail.com">vergiorder@gmail.com</a></p>
+        <p>For the purposes of applicable UK data protection law, including the UK General Data Protection Regulation ("UK GDPR") and the Data Protection Act 2018, we are the data controller for the personal data we process in connection with your use of Birthday Wishes Alert, except where stated otherwise.</p>
+
+        <h2>1. What is Birthday Wishes Alert?</h2>
+        <p>Birthday Wishes Alert is a service that helps users remember birthdays and, where enabled by the user, receive birthday reminders and related notifications.</p>
+        <p>To provide this service, we need to process certain personal information about our registered users and information that users choose to enter into the service.</p>
+
+        <h2>2. Personal Information We Collect</h2>
+        <p>Depending on how you use the service, we may collect the following information:</p>
+        <h3>Information you provide when creating an account or Updating Profile</h3>
+        <p>This may include:</p>
+        <ul>
+          <li>Email address</li>
+          <li>Telephone or mobile number, where you choose to provide one</li>
+          <li>Password or authentication credentials</li>
+          <li>Account information and preferences</li>
+        </ul>
+
+        <h3>Birthday information</h3>
+        <p>When you use Birthday Wishes Alert, you may provide information about people whose birthdays you want to remember.</p>
+        <p>This may include:</p>
+        <ul>
+          <li>Name</li>
+          <li>Date of birth or birthday (Birth Year is not collected)</li>
+          <li>Relationship or other information you choose to associate with the birthday record</li>
+          <li>Reminder preferences</li>
+        </ul>
+        <p><em>You should only provide information about another person where you have a reasonable basis for doing so and where the information is appropriate for the purpose of using the Birthday Wishes Alert service.</em></p>
+
+        <h3>Notification information</h3>
+        <p>We may process information necessary to provide notifications that you have requested, such as:</p>
+        <ul>
+          <li>Email address</li>
+          <li>Telephone/mobile number where applicable</li>
+          <li>Notification preferences</li>
+          <li>Reminder dates and times</li>
+          <li>Records of notifications sent</li>
+        </ul>
+
+        <h3>Technical information</h3>
+        <p>When you use our website, our systems may automatically process limited technical information necessary to operate and secure the service, such as:</p>
+        <ul>
+          <li>IP address</li>
+          <li>Browser type</li>
+          <li>Device information</li>
+          <li>Login/session information</li>
+          <li>Security and authentication information</li>
+          <li>Date and time of requests</li>
+        </ul>
+        <p>We do not currently use advertising or behavioural tracking technologies on Birthday Wishes Alert.</p>
+
+        <h2>3. How We Use Your Personal Data</h2>
+        <p>We use personal data for the following purposes:</p>
+        <h3>Providing the Birthday Wishes Alert service</h3>
+        <p>We process your information to:</p>
+        <ul>
+          <li>Create and maintain your account</li>
+          <li>Authenticate you securely</li>
+          <li>Store the birthday information you provide (Day and Month Only)</li>
+          <li>Schedule reminders</li>
+          <li>Send reminders and notifications that you request</li>
+          <li>Maintain your preferences</li>
+          <li>Provide customer support</li>
+          <li>Maintain and operate the service</li>
+        </ul>
+
+        <h3>Security</h3>
+        <p>We may process technical and account information to:</p>
+        <ul>
+          <li>Protect accounts</li>
+          <li>Detect and prevent unauthorised access</li>
+          <li>Detect abuse or suspicious activity</li>
+          <li>Protect the security and integrity of our systems</li>
+          <li>Investigate security incidents</li>
+        </ul>
+
+        <h3>Legal and regulatory obligations</h3>
+        <p>We may process and retain information where necessary to:</p>
+        <ul>
+          <li>Comply with applicable laws</li>
+          <li>Respond to lawful requests from authorities</li>
+          <li>Establish, exercise or defend legal claims</li>
+          <li>Maintain appropriate business and compliance records</li>
+        </ul>
+
+        <h2>4. Our Lawful Bases for Processing</h2>
+        <p>Under the UK GDPR, we must have a lawful basis for processing personal data.</p>
+        <p>Depending on the particular processing activity, we rely on one or more of the following lawful bases:</p>
+        <h3>Performance of a contract</h3>
+        <p>We process information that is necessary to provide the Birthday Wishes Alert service you have requested.</p>
+        <p>For example, storing birthday information and sending reminders that you have requested are necessary to provide the service.</p>
+
+        <h3>Legitimate interests</h3>
+        <p>We may process limited information where this is necessary for our legitimate interests, such as:</p>
+        <ul>
+          <li>Maintaining the security of the service</li>
+          <li>Preventing fraud or abuse</li>
+          <li>Protecting our systems</li>
+          <li>Improving the reliability and performance of the service</li>
+          <li>Managing and defending legal claims</li>
+        </ul>
+        <p>Where we rely on legitimate interests, we consider whether our interests are balanced against your rights and freedoms.</p>
+
+        <h3>Legal obligation</h3>
+        <p>We may process information where processing is necessary for us to comply with a legal obligation.</p>
+
+        <h3>Consent</h3>
+        <p>Where applicable law requires consent, we will request consent before carrying out the relevant processing.</p>
+        <p>You may withdraw consent at any time where processing is based on consent. Withdrawal of consent does not affect the lawfulness of processing carried out before withdrawal.</p>
+
+        <h2>5. Birthday Information About Other People</h2>
+        <p>Birthday Wishes Alert allows users to enter information about other people.</p>
+        <p>The person whose birthday information you enter may not have a Birthday Wishes Alert account.</p>
+        <p>You are responsible for ensuring that the information you provide is appropriate for the service and that you have a lawful basis for providing it to us.</p>
+        <p>We use this information only for the purposes associated with the Birthday Wishes Alert service, such as storing the birthday and providing reminders or notifications requested by the user.</p>
+        <p>Where appropriate, individuals whose information is held by us may exercise their applicable data protection rights. Requests can be made using the contact details in this Privacy Policy.</p>
+
+        <h2>6. Information We Do Not Intend to Collect</h2>
+        <p>Birthday Wishes Alert is not designed to collect sensitive personal information such as:</p>
+        <ul>
+          <li>Health information</li>
+          <li>Biometric information</li>
+          <li>Religious beliefs</li>
+          <li>Political opinions</li>
+          <li>Sexual orientation</li>
+          <li>Criminal conviction information</li>
+        </ul>
+        <p>Please do not enter sensitive personal information into birthday records or other free-text fields unless the service specifically requests it.</p>
+
+        <h2>7. How We Share Personal Data</h2>
+        <p>We do not sell your personal information.</p>
+        <p>We may share personal data with service providers that help us operate Birthday Wishes Alert.</p>
+        <p>Depending on the services currently used by Birthday Wishes Alert, these may include:</p>
+        <ul>
+          <li>Website and application hosting providers</li>
+          <li>Database providers</li>
+          <li>Email delivery providers</li>
+          <li>Notification providers</li>
+          <li>Authentication providers</li>
+          <li>Security and infrastructure providers</li>
+          <li>Professional advisers where necessary</li>
+          <li>Government bodies, regulators or law-enforcement authorities where legally required</li>
+        </ul>
+        <p>These providers may process personal data on our behalf and, where applicable, are required to provide appropriate safeguards for the information they process.</p>
+        <ul>
+          <li><strong>Firebase Authentication</strong> — account creation/authentication.</li>
+          <li><strong>Google/Firebase</strong> as a service provider/data processor.</li>
+          <li><strong>reCAPTCHA</strong> — security/abuse prevention during authentication or other protected actions.</li>
+          <li>Technical information that may be processed by these services.</li>
+          <li>International processing/transfers where applicable.</li>
+          <li>Google/Firebase Privacy Policy: https://firebase.google.com/support/privacy</li>
+        </ul>
+        <p>We may also disclose information where necessary to protect our legal rights, users, the service or the security of our systems.</p>
+
+        <h2>8. International Transfers</h2>
+        <p>Some of our service providers may process personal data outside the United Kingdom.</p>
+        <p>Where personal data is transferred outside the UK, we will ensure that the transfer is made in accordance with applicable UK data protection law and that appropriate safeguards are in place where required.</p>
+        <p>These safeguards may include an adequacy decision or appropriate contractual safeguards such as the applicable UK International Data Transfer Agreement or International Data Transfer Addendum.</p>
+        <p>We use Hostinger (UK-based hosting and email services) for website hosting and email delivery, and Firebase Authentication (EU region eur3) for user authentication and account management.</p>
+
+        <h2>9. How Long We Keep Your Information</h2>
+        <p>We keep personal information only for as long as it is reasonably necessary for the purposes described in this Privacy Policy.</p>
+        <p>Generally:</p>
+        <ul>
+          <li>Account information is retained while your account remains active.</li>
+          <li>Birthday records are retained while you choose to keep them in your account.</li>
+          <li>Notification information is retained as necessary to provide the notification service and maintain appropriate records.</li>
+          <li>Security and technical records may be retained for an appropriate period for security, troubleshooting, legal and accountability purposes.</li>
+        </ul>
+        <p>When you delete your account, we will delete or anonymise personal information that we no longer need, subject to any legal, security or legitimate business requirements that require us to retain certain information for a limited period.</p>
+        <p>We will not keep personal data indefinitely without a valid reason.</p>
+
+        <h2>10. Account Deletion</h2>
+        <p>You may request deletion of your Birthday Wishes Alert account and associated personal information.</p>
+        <p>You can contact us at:</p>
+        <p><a href="mailto:vergiorder@gmail.com">vergiorder@gmail.com</a></p>
+        <p>or Request within the App</p>
+        <p>Where account deletion is requested, we will take reasonable steps to delete or anonymise personal information that we are no longer required or permitted to retain.</p>
+        <p>Some information may need to be retained where required by law or where necessary to establish, exercise or defend legal claims.</p>
+
+        <h2>11. Your Data Protection Rights</h2>
+        <p>Subject to applicable law, you may have rights including:</p>
+        <ul>
+          <li>The right to be informed about how your personal data is used</li>
+          <li>The right to access your personal data</li>
+          <li>The right to correct inaccurate or incomplete personal data</li>
+          <li>The right to request deletion of your personal data</li>
+          <li>The right to restrict certain processing</li>
+          <li>The right to object to certain processing</li>
+          <li>The right to data portability in applicable circumstances</li>
+          <li>Rights relating to automated decision-making and profiling, where applicable</li>
+          <li>The right to withdraw consent where processing is based on consent</li>
+        </ul>
+        <p>To exercise a right, contact us using:</p>
+        <p><a href="mailto:vergiorder@gmail.com">vergiorder@gmail.com</a></p>
+        <p>We may need to verify your identity before fulfilling certain requests.</p>
+
+        <h2>12. Data Access Requests</h2>
+        <p>If you ask us for a copy of your personal data, we will handle your request in accordance with applicable data protection law.</p>
+        <p>We will normally respond without undue delay and within the applicable statutory time period.</p>
+        <p>We will not normally charge a fee for a standard data protection request. However, applicable law allows organisations to charge a reasonable fee in certain circumstances, such as where requests are manifestly unfounded or excessive.</p>
+
+        <h2>13. Keeping Your Information Accurate</h2>
+        <p>We rely on you to provide accurate information and to update your account when information changes.</p>
+        <p>You can update information held in your Birthday Wishes Alert account where the relevant functionality is available.</p>
+        <p>You may also contact us if you believe that information we hold about you is inaccurate.</p>
+
+        <h2>14. Security</h2>
+        <p>We take appropriate technical and organisational measures designed to protect personal information against:</p>
+        <ul>
+          <li>Unauthorised access</li>
+          <li>Unauthorised alteration</li>
+          <li>Loss</li>
+          <li>Destruction</li>
+          <li>Accidental disclosure</li>
+          <li>Other unlawful processing</li>
+        </ul>
+        <p>These measures may include secure authentication, access controls, encryption where appropriate, secure communications and monitoring of our systems.</p>
+        <p>However, no internet-based service can guarantee absolute security.</p>
+        <p>You should keep your account credentials confidential and notify us if you believe your account has been accessed without permission.</p>
+
+        <h2>15. Data Breaches</h2>
+        <p>If we become aware of a personal data breach, we will assess the incident and take appropriate steps in accordance with applicable data protection law.</p>
+        <p>Where legally required, we will notify the Information Commissioner's Office ("ICO") and/or affected individuals within the applicable timeframe.</p>
+
+        <h2>16. Children's Privacy</h2>
+        <p>Birthday Wishes Alert is not intended to encourage children to create accounts or provide personal information without appropriate consideration.</p>
+        <p>The service may, however, contain birthday information relating to children because an adult user may choose to record a child's birthday.</p>
+        <p>Users should avoid entering unnecessary information about children.</p>
+        <p>Where applicable, we will take appropriate measures required by UK data protection law when processing children's personal data.</p>
+
+        <h2>17. Cookies</h2>
+        <p>Birthday Wishes Alert currently uses only cookies that are necessary for user authentication and the secure operation of the service.</p>
+        <p>We do not currently use:</p>
+        <ul>
+          <li>Advertising cookies</li>
+          <li>Behavioural tracking cookies</li>
+          <li>Social media tracking cookies</li>
+          <li>Analytics cookies</li>
+          <li>Marketing cookies</li>
+        </ul>
+        <p>Further information is available in our <strong>Cookie Policy</strong>.</p>
+
+        <h2>18. Third-Party Websites and Services</h2>
+        <p>Birthday Wishes Alert may contain links to third-party websites or services.</p>
+        <p>We are not responsible for the privacy practices of third-party websites.</p>
+        <p>You should review the privacy policies of third-party services before providing them with personal information.</p>
+
+        <h2>19. Changes to This Privacy Policy</h2>
+        <p>We may update this Privacy Policy from time to time to reflect:</p>
+        <ul>
+          <li>Changes to the Birthday Wishes Alert service</li>
+          <li>Changes to our data-processing activities</li>
+          <li>Changes to applicable law or regulatory guidance</li>
+          <li>Changes to our service providers</li>
+        </ul>
+        <p>When we make material changes, we will take reasonable steps to bring them to your attention.</p>
+        <p>The "Last updated" date at the top of this Privacy Policy will indicate when it was most recently updated.</p>
+
+        <h2>20. Complaints</h2>
+        <p>If you have concerns about how we use your personal information, please contact us first:</p>
+        <p><a href="mailto:vergiorder@gmail.com">vergiorder@gmail.com</a></p>
+        <p>We will investigate and respond to your concern in accordance with our applicable data protection obligations.</p>
+        <p>You also have the right to complain to the UK's data protection regulator:</p>
+        <p><strong>Information Commissioner's Office (ICO)</strong></p>
+        <p>Website: https://ico.org.uk/</p>
+        <p>The ICO can provide information about your data protection rights and investigate concerns about organisations processing personal data.</p>
+
+        <h2>21. Contact Us</h2>
+        <p>If you have questions about this Privacy Policy, your personal data or how we process information, please contact:</p>
+        <p><strong>PRODUCTDRIVE</strong><br><strong>Email:</strong> <a href="mailto:vergiorder@gmail.com">vergiorder@gmail.com</a></p>
+        <p class="last-updated"><strong>Last updated: 18 August 2026</strong></p>
+      </div>
+
+      <!-- Cookies Policy -->
+      <div *ngIf="activeTab === 'cookies'" class="policy-content">
+        <h1>Cookie Policy</h1>
+        <p class="last-updated"><strong>Last updated: 18 August 2026</strong></p>
+        <p>This Cookie Policy explains how Birthday Wishes Alert ("Birthday Wishes Alert", "we", "us" or "our") uses cookies and similar technologies on <strong>https://www.birthdaywishesalert.co.uk/</strong>.</p>
+
+        <h2>1. What Are Cookies?</h2>
+        <p>Cookies are small files or pieces of information stored on your device when you visit a website.</p>
+        <p>They can be used for different purposes, including remembering preferences, providing security, analysing website usage and delivering advertising.</p>
+        <p>Birthday Wishes Alert currently uses cookies only where they are necessary to provide the service and authenticate users.</p>
+
+        <h2>2. Cookies We Currently Use</h2>
+        <p>Birthday Wishes Alert uses essential authentication/session technologies. We also use Google reCAPTCHA as a security technology to help protect the service from automated abuse and fraudulent activity. Depending on the configuration of these services, Google may use cookies or other technologies to provide and secure the service.</p>
+        <p>These cookies are necessary for the operation and security of the service.</p>
+        <p>They may be used to:</p>
+        <ul>
+          <li>Keep you securely signed in</li>
+          <li>Maintain your authenticated session</li>
+          <li>Recognise your authenticated session when you move between pages</li>
+          <li>Protect authenticated areas of the application</li>
+          <li>Support the secure operation of the service</li>
+        </ul>
+        <p>These cookies do not exist for advertising or behavioural tracking purposes.</p>
+
+        <h2>3. Essential Cookies</h2>
+        <p>Our authentication cookies are considered essential because the Birthday Wishes Alert service requires them to maintain a secure authenticated session.</p>
+        <p>If these cookies are disabled, certain parts of Birthday Wishes Alert, particularly authenticated account functionality, may not work correctly.</p>
+        <p>Under applicable UK rules, consent is not generally required for storage or access technologies that are strictly necessary to provide an online service requested by the user. We nevertheless provide this information so that users understand how cookies are used.</p>
+
+        <h2>4. Cookies We Do Not Currently Use</h2>
+        <p>Birthday Wishes Alert currently does not use cookies for:</p>
+        <ul>
+          <li>Advertising</li>
+          <li>Behavioural advertising</li>
+          <li>Cross-site tracking</li>
+          <li>Social media tracking</li>
+          <li>Analytics</li>
+          <li>Marketing</li>
+          <li>Profiling</li>
+        </ul>
+        <p>We also do not currently use third-party analytics cookies.</p>
+
+        <h2>5. Third-Party Cookies</h2>
+        <p>At present, we do not intentionally use third-party cookies for advertising, analytics or tracking purposes.</p>
+        <p>If this changes in the future, we will update this Cookie Policy and, where required by law, obtain consent before using non-essential cookies or similar technologies.</p>
+
+        <h2>6. Managing Cookies</h2>
+        <p>You can control or delete cookies through your web browser settings.</p>
+        <p>However, disabling essential authentication cookies may prevent you from using some or all authenticated features of Birthday Wishes Alert.</p>
+        <p>Because Birthday Wishes Alert currently uses only essential cookies, we do not currently provide a separate non-essential cookie consent banner.</p>
+        <p>If we introduce non-essential cookies or similar technologies in the future, we will implement an appropriate consent mechanism before using them where required.</p>
+
+        <h2>7. Changes to This Cookie Policy</h2>
+        <p>We may update this Cookie Policy if:</p>
+        <ul>
+          <li>We introduce new functionality</li>
+          <li>We introduce additional cookies or similar technologies</li>
+          <li>Our service providers change</li>
+          <li>Applicable law or regulatory guidance changes</li>
+        </ul>
+        <p>If we introduce non-essential cookies, we will update this policy to explain what they are used for and, where required, obtain your consent before setting them.</p>
+
+        <h2>8. Contact Us</h2>
+        <p>If you have questions about our use of cookies, please contact:</p>
+        <p><strong>PRODUCTDRIVE</strong><br><strong>Email:</strong> <a href="mailto:vegiorder@gmail.com">vegiorder@gmail.com</a></p>
+        <p class="last-updated"><strong>Last updated: 18 August 2026</strong></p>
+      </div>
+    </div>
+
+    <div *ngIf="showAcceptButton" class="modal-footer">
+      <button (click)="onAccept()" class="accept-btn">
+        I Have Read and Accept
+      </button>
+    </div>
+  </div>
+</div>

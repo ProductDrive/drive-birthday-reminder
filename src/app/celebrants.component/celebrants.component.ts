@@ -9,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 import { map } from 'rxjs/operators';
 import { CelebrantsEditModalComponent, EditCelebrantData } from './celebrants-edit-modal.component';
@@ -17,6 +17,8 @@ import { AuthService, UserProfile } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { MessagingService } from '../services/messaging.service';
 import { BirthdayCardService } from '../services/birthday-card.service';
+import { NotificationService } from '../services/notification.service';
+import { PoliciesPopupComponent } from '../policies-popup/policies-popup.component';
 
 const UNGROUPED_KEY = '__ungrouped__';
 
@@ -39,7 +41,8 @@ interface CelebrantSection {
     MatFormFieldModule,
     MatCheckboxModule,
     FormsModule,
-    CelebrantsEditModalComponent
+    CelebrantsEditModalComponent,
+    PoliciesPopupComponent
   ],
   templateUrl: './celebrants.component.html',
   styleUrls: ['./celebrants.component.scss'],
@@ -77,6 +80,16 @@ export class CelebrantsComponent implements OnInit {
 
   showTodayBanner = true;
   todayCelebrants: Celebrant[] = [];
+
+  // Policy acceptance popup for existing users
+  showPoliciesPopup = false;
+  policiesPopupTab: 'privacy' | 'cookies' = 'privacy';
+
+  // Account deletion
+  showDeletionConfirm = false;
+  isRequestingDeletion = false;
+  deletionReason = '';
+  deletionRequested = false;
 
   editCelebrant(celebrant: Celebrant) {
     this.editingCelebrantId = celebrant.id || null;
@@ -146,6 +159,7 @@ export class CelebrantsComponent implements OnInit {
     private authService: AuthService,
     private messagingService: MessagingService,
     private birthdayCardService: BirthdayCardService,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -243,6 +257,13 @@ export class CelebrantsComponent implements OnInit {
         this.whatsappNumber = this.userProfile.whatsappNumber || '';
         this.whatsappOptIn = this.userProfile.whatsappOptIn || false;
         this.selectedTemplate = this.userProfile.selectedTemplate || 'celebration-classic';
+        // Show policy acceptance popup for existing users who haven't accepted
+        if (!this.userProfile.policiesAccepted) {
+          this.showPoliciesPopup = true;
+        }
+      } else {
+        // No profile yet — show policy popup
+        this.showPoliciesPopup = true;
       }
       const bannerDismissed = localStorage.getItem(this.templateBannerKey(user.uid)) === '1';
       this.showTemplateBanner = !this.userProfile?.selectedTemplate && !bannerDismissed;
@@ -393,5 +414,62 @@ export class CelebrantsComponent implements OnInit {
 
   viewAllTemplates() {
     this.router.navigate(['/templates']);
+  }
+
+  // ── Policy acceptance ────────────────────────────────────────────────
+  openPoliciesPopup(tab: 'privacy' | 'cookies') {
+    this.policiesPopupTab = tab;
+    this.showPoliciesPopup = true;
+  }
+
+  async acceptPolicies() {
+    const user = this.auth.currentUser;
+    if (user) {
+      await this.authService.acceptPolicies(user.uid);
+      if (this.userProfile) {
+        this.userProfile.policiesAccepted = true;
+      }
+    }
+    this.showPoliciesPopup = false;
+  }
+
+  // ── Logout ───────────────────────────────────────────────────────────
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/auth']);
+  }
+
+  // ── Account deletion request ─────────────────────────────────────────
+  openDeletionConfirm() {
+    this.showDeletionConfirm = true;
+    this.deletionReason = '';
+  }
+
+  closeDeletionConfirm() {
+    this.showDeletionConfirm = false;
+    this.deletionReason = '';
+  }
+
+  async requestAccountDeletion() {
+    const user = this.auth.currentUser;
+    if (!user) return;
+
+    this.isRequestingDeletion = true;
+    try {
+      await firstValueFrom(
+        this.notificationService.requestAccountDeletion({
+          userId: user.uid,
+          email: user.email || '',
+          reason: this.deletionReason
+        })
+      );
+      this.deletionRequested = true;
+      this.showDeletionConfirm = false;
+    } catch (err) {
+      console.error('Deletion request failed:', err);
+      alert('Failed to submit deletion request. Please try again or contact support.');
+    } finally {
+      this.isRequestingDeletion = false;
+    }
   }
 }
