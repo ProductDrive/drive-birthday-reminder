@@ -21,6 +21,7 @@ export interface UserProfile {
   whatsappNumber?: string;
   whatsappOptIn?: boolean;
   selectedTemplate?: string;
+  policiesAccepted?: boolean;
   createdAt: string;
 }
 
@@ -108,5 +109,9 @@ export class AuthService {
   async updateUserProfile(userId: string, data: Partial<UserProfile>): Promise<void> {
     const docRef = doc(this.firestore, 'users', userId);
     await setDoc(docRef, { userId, ...data }, { merge: true });
+  }
+
+  async acceptPolicies(userId: string): Promise<void> {
+    await this.updateUserProfile(userId, { policiesAccepted: true });
   }
 }

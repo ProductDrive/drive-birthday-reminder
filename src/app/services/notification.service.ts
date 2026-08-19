@@ -30,4 +30,8 @@ export class NotificationService {
   verifyRecaptcha(token: string): Observable<{ valid: boolean; score?: number }> {
     return this.http.post<{ valid: boolean; score?: number }>(`${this.baseUrl}/api/birthday/verify-recaptcha`, { token });
   }
+
+  requestAccountDeletion(data: { userId: string; email: string; reason?: string }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/api/birthday/request-deletion`, data);
+  }
 }

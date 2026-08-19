@@ -13,6 +13,7 @@ import { Auth } from '@angular/fire/auth';
 import { environment } from '../../environment';
 import { NotificationService } from '../services/notification.service';
 import { firstValueFrom } from 'rxjs';
+import { PoliciesPopupComponent } from '../policies-popup/policies-popup.component';
 
 const SIGNUP_MAX_ATTEMPTS = 3;
 const SIGNUP_LOCK_MS = 60 * 1000;
@@ -27,7 +28,7 @@ declare global {
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, PoliciesPopupComponent],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss',
 })
@@ -53,6 +54,12 @@ export class AuthComponent implements OnInit, OnDestroy {
   captchaResponse = '';
   private recaptchaReady = false;
   signupLockSeconds = 0;
+
+  // Policy checkboxes (signup only)
+  acceptPolicies = false;
+  ageConfirmed = false;
+  showPoliciesPopup = false;
+  policiesPopupTab: 'privacy' | 'cookies' = 'privacy';
 
   constructor(
     private authService: AuthService,
@@ -82,6 +89,17 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.isLogin = !this.isLogin;
     this.message = '';
     this.resetCaptcha();
+    this.acceptPolicies = false;
+    this.ageConfirmed = false;
+  }
+
+  openPoliciesPopup(tab: 'privacy' | 'cookies') {
+    this.policiesPopupTab = tab;
+    this.showPoliciesPopup = true;
+  }
+
+  closePoliciesPopup() {
+    this.showPoliciesPopup = false;
   }
 
   // ── reCAPTCHA Enterprise (score-based, invisible) ─────────────────────
@@ -157,6 +175,12 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.message = '';
     // Honeypot: bots fill hidden fields; silently drop.
     if (this.website) return;
+
+    // Signup: require both checkboxes
+    if (!this.isLogin && (!this.acceptPolicies || !this.ageConfirmed)) {
+      this.message = '⚠️ Please accept the Privacy & Cookies Policy and confirm you are 18 or older.';
+      return;
+    }
 
     if (this.recaptchaSiteKey) {
       this.captchaResponse = await this.getRecaptchaToken();
